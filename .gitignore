@@ -1,0 +1,6 @@
+venv
+*.pyc
+staticfiles
+.env
+/stockvisual/private_keys.py
+/node_modules/
