@@ -3,7 +3,7 @@ anaconda-client
 
 
 appnope==0.1.0
-appscript==1.0.1
+
 asn1crypto==0.22.0
 astroid==1.5.3
 astropy==2.0.2
