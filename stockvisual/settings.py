@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-from .private_keys import my_secret_key
+#from .private_keys import my_secret_key
+from boto.s3.connection import S3Connection
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +24,8 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = my_secret_key
+#SECRET_KEY = my_secret_key
+SECREY_KEY = S3Connection(os.environ['SECREY_KEY'])
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -136,4 +139,3 @@ WEBPACK_LOADER = {
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
     }
 }
-
