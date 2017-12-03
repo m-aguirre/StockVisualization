@@ -1,1 +1,1 @@
-web: gunicorn stockvisual.wsgi:application --preload --workers 1
+web: python stockvisual/manage.py; gunicorn stockvisual.wsgi:application --preload --workers 1
