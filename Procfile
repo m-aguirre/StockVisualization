@@ -1,1 +1,1 @@
-web: gunicorn stockvisual.wsgi
+web: gunicorn stockvisual.wsgi:application --preload --workers 1
