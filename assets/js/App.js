@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { Component }from 'react';
 
+import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
+import aaplData from './models/dataFile.js';
+import OutlierDetector from './components/OutlierDetector.jsx';
+
+//s
 class App extends React.Component {
     render(){
         return (
-            <h1>Hello Django - React Skeleton</h1>
+            <OutlierDetector />
         );
     }
 }

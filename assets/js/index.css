@@ -1,0 +1,81 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.regression-description {
+  width: 70%;
+  height: auto;
+  margin: auto;
+}
+
+.graph-pane {
+  width: 100vw;
+  height: 500px;
+  margin: auto;
+  overflow: visible;
+  padding-left: 20px;
+}
+
+
+.stock-description  {
+    width: 100vw;
+    height: auto;
+    display: inline-block;
+    text-align: center;
+
+}
+.stock-description h2 {
+  position: relative;
+  display: inline-block;
+  float: left;
+  margin-left: 20px;
+}
+
+.viewport {
+  margin-left: 10%;
+  overflow: visible;
+}
+
+.outlier-info-box {
+  stroke: black;
+  fill: white;
+
+}
+
+.outlier-data {
+  overflow: hidden;
+  color: red;
+  font-size: 14px;
+}
+
+.time-interval-button-container {
+  width: 70vw !important;
+  height: auto;
+  display: inline-flex;
+  margin: 0;
+
+}
+
+.time-interval-button {
+  min-width: 10vw;
+  height: 5vh;
+  background-color: #41a6f4;
+  color: white;
+  border-radius: 5px;
+  border-style: double;
+  margin: 3%;
+  align-items: center;
+  line-height: 2.5vh;
+  text-align: center;
+  cursor: pointer;
+}
+
+.time-interval-button :hover {
+  transition: opacity 0.25s ease-in-out;
+  opacity: 0.75;
+}
+.time-interval-button p {
+  transform: translate(0, -50%);
+}

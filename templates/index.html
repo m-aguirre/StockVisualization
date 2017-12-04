@@ -5,6 +5,9 @@
     <title>Example</title>
 </head>
 <body>
+<script src="js/reactjs/main.js" type = "text/babel"></script>
+<script src="bundle.js"></script>
+<script type="text/babel"></script>
 {% load render_bundle from webpack_loader %}<h1>Example</h1>
 <div id="react-app"></div>
 {% render_bundle 'main' %}
