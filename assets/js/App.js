@@ -3,7 +3,7 @@ import React, { Component }from 'react';
 import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
 import aaplData from './models/dataFile.js';
 import OutlierDetector from './components/OutlierDetector.jsx';
-//import styles from "./index.css";
+import styles from "../css/index.css";
 
 
 class App extends React.Component {
