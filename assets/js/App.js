@@ -4,7 +4,7 @@ import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
 import aaplData from './models/dataFile.js';
 import OutlierDetector from './components/OutlierDetector.jsx';
 
-//s
+
 class App extends React.Component {
     render(){
         return (
