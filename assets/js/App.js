@@ -3,12 +3,13 @@ import React, { Component }from 'react';
 import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
 import aaplData from './models/dataFile.js';
 import OutlierDetector from './components/OutlierDetector.jsx';
+import styles from "./index.css";
 
 
 class App extends React.Component {
     render(){
         return (
-          <div className="App">
+          <div className={styles.App}>
         <h1>Outlier Detection With Linear Regression</h1>
         <p className="App-intro">
 
