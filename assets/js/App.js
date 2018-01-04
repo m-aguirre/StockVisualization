@@ -6,13 +6,16 @@ import OutlierDetector from './components/OutlierDetector.jsx';
 import "../css/index.css";
 
 
+import SymbolInputField from './components/SymbolInputField.jsx';
+
 class App extends React.Component {
     render(){
         return (
           <div className="App">
         <h1>Outlier Detection With Linear Regression</h1>
+        <SymbolInputField />
         <p className="App-intro">
-
+          
         </p>
         <div className="stock-description">
           <h2>AAPL 2014</h2>
