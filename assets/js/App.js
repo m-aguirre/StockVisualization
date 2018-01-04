@@ -1,4 +1,5 @@
 import React, { Component }from 'react';
+import axios from 'axios';
 
 import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
 import aaplData from './models/dataFile.js';
@@ -9,13 +10,37 @@ import "../css/index.css";
 import SymbolInputField from './components/SymbolInputField.jsx';
 
 class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      inputSymbol: ''
+    }
+
+    this.getTimeSeriesData = this.getTimeSeriesData.bind(this);
+  }
+
+  getTimeSeriesData(symbol) {
+    this.setState({inputSymbol: symbol} , () => {
+      console.log(this.state)
+      var symbolRoute = '/' + symbol + '/';
+      axios.get(symbolRoute)
+        .then( function(response) {
+          console.log(response);
+        })
+        .catch( function(error) {
+          console.log(error);
+        })
+    })
+
+  //  console.log(this.state);
+  }
     render(){
         return (
           <div className="App">
         <h1>Outlier Detection With Linear Regression</h1>
-        <SymbolInputField />
+        <SymbolInputField submitSymbol={this.getTimeSeriesData}/>
         <p className="App-intro">
-          
+
         </p>
         <div className="stock-description">
           <h2>AAPL 2014</h2>

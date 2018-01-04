@@ -16,7 +16,7 @@ class SymbolInputField extends React.Component {
   }
 
   handleSubmit(e) {
-    alert('symbol entered');
+    this.props.submitSymbol(this.state.inputText);
     e.preventDefault();
   }
 
