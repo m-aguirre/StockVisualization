@@ -9,14 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.17.1",
     "babel": "^6.23.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
+    "d3": "^4.11.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "webpack": "^3.8.1",
-    "webpack-dev-server": "^2.9.5",
-    "d3": "^4.11.0"
+    "webpack-dev-server": "^2.9.5"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
