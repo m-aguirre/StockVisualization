@@ -3,7 +3,7 @@ import * as d3 from "d3";
 class DateScale {
   constructor(currentDate, daysToSubtract) {
 
-    this.startDate = this.calculateStartDate(currentDate, daysToSubtract);
+    this.startDate = this.calculateStartDate(daysToSubtract);
 
     //creates linearly spaced scale for x-coordinate
     this.xScale = d3.scaleTime()
@@ -16,11 +16,18 @@ class DateScale {
     this.numTicks = this.findNumberOfTicks(daysToSubtract);
   }
 
-  calculateStartDate(endDate, daysToSubtract) {
-    var date = new Date(endDate);
-    date.setDate(date.getDate() - daysToSubtract);
-    return new Date(date);
+  //NEW startDate calculator
+  calculateStartDate(daysToSubtract) {
+    var currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - daysToSubtract);
+    return new Date(currentDate);
   }
+
+  // calculateStartDate(endDate, daysToSubtract) {
+  //   var date = new Date(endDate);
+  //   date.setDate(date.getDate() - daysToSubtract);
+  //   return new Date(date);
+  // }
 
   findNumberOfTicks(daysToSubtract) {
       switch(daysToSubtract) {
