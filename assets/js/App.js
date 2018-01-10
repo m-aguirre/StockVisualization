@@ -2,12 +2,11 @@ import React, { Component }from 'react';
 import axios from 'axios';
 
 import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
+import SymbolInputField from './components/SymbolInputField.jsx';
 import aaplData from './models/dataFile.js';
 import OutlierDetector from './components/OutlierDetector.jsx';
 import "../css/index.css";
 
-
-import SymbolInputField from './components/SymbolInputField.jsx';
 
 class App extends React.Component {
   constructor(props) {
@@ -22,17 +21,16 @@ class App extends React.Component {
   getTimeSeriesData(symbol) {
     this.setState({inputSymbol: symbol} , () => {
       console.log(this.state)
-      var symbolRoute = '/' + symbol + '/';
+    //  var symbolRoute = 'search/' + symbol + '/';
+      var symbolRoute = '/search/';
       axios.get(symbolRoute)
         .then( function(response) {
           console.log(response);
         })
         .catch( function(error) {
-          console.log(error);
-        })
-    })
-
-  //  console.log(this.state);
+          console.log("Error in GET Request: ", error);
+        });
+    });
   }
     render(){
         return (
