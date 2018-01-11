@@ -1,5 +1,7 @@
 import React from 'react';
 
+import AnalysisTypeSelector from './AnalysisTypeSelector.jsx';
+import ModelSelector from './ModelSelector.jsx';
 
 class SelectionContainer extends React.Component {
   constructor(props) {
@@ -9,9 +11,9 @@ class SelectionContainer extends React.Component {
   render() {
     return (
       <div className="selection-container">
-        <p>Analysis Type:</p>
 
-        <p>Model: </p>
+        <AnalysisTypeSelector />
+        <ModelSelector />
       </div>
     )
   }

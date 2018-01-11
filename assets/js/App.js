@@ -15,8 +15,9 @@ class App extends React.Component {
     this.state = {
       inputSymbol: '',
       timeSeriesData: '',
-      showOutlierDetector: false,
-      invalidSymbolInput: false
+      invalidSymbolInput: false,
+      showSelectionContainer: false,
+      showOutlierDetector: false
     }
 
     this.getTimeSeriesData = this.getTimeSeriesData.bind(this);
@@ -30,7 +31,7 @@ class App extends React.Component {
       axios.get(symbolRoute)
         .then( function(response) {
           console.log(response);
-          that.setState({timeSeriesData: response.data, showOutlierDetector: true, invalidSymbolInput: false});
+          that.setState({timeSeriesData: response.data, showSelectionContainer: true, invalidSymbolInput: false});
         })
         .catch( function(error) {
           console.log("Error in GET Request: ", error);
@@ -53,9 +54,14 @@ class App extends React.Component {
           <h2>{this.state.inputSymbol}</h2>
 
           {
+            this.state.showSelectionContainer ?
+            <SelectionContainer /> :
+            <p>Please enter a valid stock symbol to get started (Ex: AAPL, TSLA, FB, etc.) </p>
+          }
+          {
             this.state.showOutlierDetector ?
             <OutlierDetector timeSeriesData={this.state.timeSeriesData}/> :
-            <p>Please enter a valid stock symbol to get started (Ex: AAPL, TSLA, FB, etc.) </p>
+            null
           }
         </div>
       </div>

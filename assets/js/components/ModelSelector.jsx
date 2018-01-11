@@ -1,7 +1,8 @@
 import React from 'react';
 
-class AnalysisTypeSelector extends React.Component {
-  constructor(props) {
+
+class ModelSelector extends React.Component {
+  constructor(props){
     super(props)
     this.state = {
       value: 'select'
@@ -21,9 +22,9 @@ class AnalysisTypeSelector extends React.Component {
       <div>
         <form onSubmit={this.handleSubmit} onChange={this.handleChange}>
         <label className="selector-label">
-          Analysis Type:
+          Model Type:
           <select value={this.state.value}>
-            <option value="outlier">Outlier Detection</option>
+            <option value="linearRegression">Linear Regression</option>
           </select>
         </label>
       </form>
@@ -32,4 +33,4 @@ class AnalysisTypeSelector extends React.Component {
   }
 }
 
-export default AnalysisTypeSelector;
+export default ModelSelector;
