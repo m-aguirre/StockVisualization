@@ -15,7 +15,7 @@ class RegressionOutlierDetector {
     this.daysToSubtract = daysToSubtract;
     //controls speed of animation
     this.delayFactor = 8;
-    this.endDate = new Date();
+    this.endDate = Date.parse(new Date());
 
     this.xcoord = new DateScale(daysToSubtract);
     this.xScale = this.xcoord.xScale;
@@ -70,20 +70,21 @@ class RegressionOutlierDetector {
     var sumXY = 0;
     var sumXSquared = 0;
     var sumYSquared = 0;
-    var n = Object.keys(data).length;
+    //var n = Object.keys(data).length;
+    var n = data.length;
 
     data.forEach( (d) => {
       var date = d["Date"];
       var y = +d["Adj. Close"];
       //number of days between current date and start date - don't ask where 86400000 came from
-      var x = (Math.floor((Date.parse(this.endDate) - this.xcoord.startDate)/86400000));
+      //TODO adjust so it counts the number of BUSINESS days and not total days
+      var x = (Math.floor((date - this.xcoord.startDate)/86400000));
       sumX += x;
       sumY += y;
       sumXY += (x * y);
       sumXSquared += (x * x);
       sumYSquared += (y * y);
     });
-
     var b0 = ( ((sumY * sumXSquared) - (sumX * sumXY)) / ((n * sumXSquared) - (sumX * sumX)) );
     var b1 = ( ((n * sumXY) - (sumX * sumY)) / ((n * sumXSquared) - (sumX * sumX)) );
 
@@ -194,13 +195,13 @@ class RegressionOutlierDetector {
     d3.select('.viewport')
     .append('g')
     .append('line')
-    .attr('x1', this.xScale(Date.parse(this.line.start.x)))
+    .attr('x1', this.xScale(this.line.start.x))
     .attr('y1', this.yScale(this.line.start.y))
-    .attr('x2', this.xScale(Date.parse(this.line.start.x)))
+    .attr('x2', this.xScale(this.line.start.x))
     .attr('y2', this.yScale(this.line.start.y))
     .transition()
     .duration(1000)
-    .attr('x2', this.xScale(Date.parse(this.line.end.x)))
+    .attr('x2', this.xScale(this.line.end.x))
     .attr('y2', this.yScale(this.line.end.y))
     .style('stroke', 'black')
     .style('stroke-width', 3)
