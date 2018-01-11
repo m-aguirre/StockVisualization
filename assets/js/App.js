@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
 import SymbolInputField from './components/SymbolInputField.jsx';
+import SelectionContainer from './components/SelectionContainer.jsx';
 import aaplData from './models/dataFile.js';
 import OutlierDetector from './components/OutlierDetector.jsx';
 import "../css/index.css";
