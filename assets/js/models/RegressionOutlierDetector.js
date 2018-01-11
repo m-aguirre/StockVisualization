@@ -34,7 +34,7 @@ class RegressionOutlierDetector {
     d3.select('.viewport').remove();
     this.calculateRegressionEquation(this.data);
     this.calculateSD(this.data);
-    // this.identifyOutliers(this.data, this.dataSummary.sd);
+    this.identifyOutliers(this.data, this.dataSummary.sd);
     this.addViewport();
   }
 
@@ -118,9 +118,9 @@ class RegressionOutlierDetector {
     }
     var days = 0;
     data.forEach((d) => {
-      var pointOnLine = ((Math.floor((Date.parse(d.date) - Date.parse(this.xcoord.startDate.toISOString()))/86400000)) * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
+      var pointOnLine = ((Math.floor((d["Date"] - this.xcoord.startDate)/86400000)) * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
       //var pointOnLine = (days * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
-      if (+d.close > (pointOnLine + sigma) || +d.close < (pointOnLine - sigma)) {
+      if (+d["Adj. Close"] > (pointOnLine + sigma) || +d["Adj. Close"] < (pointOnLine - sigma)) {
         d.outlier = true;
       }
       days++;
@@ -163,10 +163,10 @@ class RegressionOutlierDetector {
     dots.append("circle")
       .data(data)
       .attr("r", 0)
-      .attr("cx", (d) => { return this.xScale(Date.parse(d.date)) })
-      .attr("cy", (d) => { return this.yScale(d.close) })
-      .attr('close', data[0].close)
-      .attr('date', data[0].date)
+      .attr("cx", (d) => { return this.xScale(d["Date"]) })
+      .attr("cy", (d) => { return this.yScale(d["Adj. Close"]) })
+      .attr('close', data[0]["Adj. Close"])
+      .attr('date', data[0]["Date"])
       .attr('outlier', (d) => { return (d.outlier ? true : false)})
       .on('mouseenter', function() {
         var dataPoint = d3.select(this);
