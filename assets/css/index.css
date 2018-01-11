@@ -36,6 +36,11 @@ body {
   position: relative;
   left: 8%;
   bottom: 5px;
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
 }
 /************* ANALYSIS SELECTORS ******************/
 
@@ -52,10 +57,15 @@ body {
   display: block;
   text-align: center;
   position: relative;
-  left: 15vw;
+  left: 10vw;
+  width: 25vw;
+  height: 8vh;
+  margin-top: 5px;
+}
+
+.selector-option {
   width: 25vw;
   height: 10vh;
-  margin-top: 5px;
 }
 
 .empty-div {

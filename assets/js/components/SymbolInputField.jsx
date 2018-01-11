@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 class SymbolInputField extends React.Component {
   constructor(props) {
     super(props)

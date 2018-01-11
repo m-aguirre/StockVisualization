@@ -45,7 +45,11 @@ class App extends React.Component {
         <h1 className="main-header">Stock Visualization</h1>
         <div className="input-form-container">
           <SymbolInputField submitSymbol={this.getTimeSeriesData}/>
-          <p className="invalid-symbol-notification"> Invalid symbol!</p>
+          {
+            this.state.invalidSymbolInput ?
+            <p className="invalid-symbol-notification"> Invalid symbol!</p> :
+            null
+          }
         </div>
         <p className="App-intro">
 

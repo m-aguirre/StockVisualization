@@ -13,8 +13,9 @@ class ModelSelector extends React.Component {
   handleSubmit() {
 
   }
-  handleChange() {
-
+  handleChange(e) {
+    console.log('Change selected');
+    this.setState({value: e.target.value});
   }
 
   render() {
@@ -24,7 +25,8 @@ class ModelSelector extends React.Component {
         <label className="selector-label">
           Model Type:
           <select className="option-selector" value={this.state.value}>
-            <option value="linearRegression">Linear Regression</option>
+            <option className="selector-option" value="select">Select...</option>
+            <option className="selector-option" value="linearRegression">Linear Regression</option>
           </select>
         </label>
       </form>
