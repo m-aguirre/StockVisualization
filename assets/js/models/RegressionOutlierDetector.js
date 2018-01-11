@@ -33,7 +33,7 @@ class RegressionOutlierDetector {
     }
     d3.select('.viewport').remove();
     this.calculateRegressionEquation(this.data);
-    //this.calculateSD(this.data);
+    this.calculateSD(this.data);
     // this.identifyOutliers(this.data, this.dataSummary.sd);
     this.addViewport();
   }
@@ -102,10 +102,10 @@ class RegressionOutlierDetector {
   }
 
   calculateSD(data) {
-    var mean = d3.mean(data, (d) => {return d.close});
+    var mean = d3.mean(data, (d) => {return d["Adj. Close"]});
     this.dataSummary.mean = mean;
     var sumLeastSquares = data.reduce( (sum, d) => {
-      return (sum + ((d.close - mean) * (d.close - mean)))
+      return (sum + ((d["Adj. Close"]- mean) * (d["Adj. Close"] - mean)))
     }, 0)
     this.dataSummary.sd = Math.sqrt(sumLeastSquares / (Object.keys(data).length - 1));
   }
