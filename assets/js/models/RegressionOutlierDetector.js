@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import DateScale from "./DateScale.js"
 
 class RegressionOutlierDetector {
-  constructor(data, currentDate, daysToSubtract) {
+  constructor(data, daysToSubtract) {
     this.data = data;
     this.dataSummary = {
       minClosingValue: d3.min(this.data, (d) => {return d["Adj. Close"]}),
@@ -15,7 +15,7 @@ class RegressionOutlierDetector {
     this.daysToSubtract = daysToSubtract;
     //controls speed of animation
     this.delayFactor = 8;
-    this.endDate = currentDate;
+    this.endDate = new Date();
 
     this.xcoord = new DateScale(daysToSubtract);
     this.xScale = this.xcoord.xScale;
@@ -32,8 +32,8 @@ class RegressionOutlierDetector {
       end: {x: this.endDate, y: 0 }
     }
     d3.select('.viewport').remove();
-    // this.calculateRegressionEquation(this.data);
-    // this.calculateSD(this.data);
+    this.calculateRegressionEquation(this.data);
+    //this.calculateSD(this.data);
     // this.identifyOutliers(this.data, this.dataSummary.sd);
     this.addViewport();
   }
@@ -73,10 +73,10 @@ class RegressionOutlierDetector {
     var n = Object.keys(data).length;
 
     data.forEach( (d) => {
-      var date = d.date;
-      var y = +d.close;
-      //number of days between current date and january first - don't ask where 86400000 came from
-      var x = (Math.floor((Date.parse(date) - Date.parse(this.xcoord.startDate.toISOString()))/86400000));
+      var date = d["Date"];
+      var y = +d["Adj. Close"];
+      //number of days between current date and start date - don't ask where 86400000 came from
+      var x = (Math.floor((Date.parse(this.endDate) - this.xcoord.startDate)/86400000));
       sumX += x;
       sumY += y;
       sumXY += (x * y);
@@ -88,8 +88,8 @@ class RegressionOutlierDetector {
     var b1 = ( ((n * sumXY) - (sumX * sumY)) / ((n * sumXSquared) - (sumX * sumX)) );
 
     // x variables
-    var minDateNumeric = d3.min(this.data, (d) => { return Math.floor((Date.parse(d.date) - Date.parse(this.xcoord.startDate.toISOString()))/86400000)});
-    var maxDateNumeric = d3.max(this.data, (d) => { return Math.floor((Date.parse(d.date) - Date.parse(this.xcoord.startDate.toISOString()))/86400000)});
+    var minDateNumeric = d3.min(this.data, (d) => { return Math.floor((d["Date"] - this.xcoord.startDate)/86400000)});
+    var maxDateNumeric = d3.max(this.data, (d) => { return Math.floor((d["Date"] - this.xcoord.startDate)/86400000)});
     var startY = b0 + (minDateNumeric * b1);
     var endY = b0 + (maxDateNumeric * b1);
 
