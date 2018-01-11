@@ -11,19 +11,20 @@ class OutlierDetector extends React.Component {
     this.calculateStartDate = this.calculateStartDate.bind(this);
   }
 
-  calculateStartDate(endDate, daysToSubtract) {
-    var date = new Date(endDate);
-    date.setDate(date.getDate() - daysToSubtract);
-    return new Date(date);
+  calculateStartDate(daysToSubtract) {
+    var currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - daysToSubtract);
+    return Date.parse(currentDate);
   }
 
   show(daysToSubtract) {
     var sourceData = aaplData.aaplData;
-    var startDate = this.calculateStartDate('2015-01-01', daysToSubtract);
+    var startDate = this.calculateStartDate(daysToSubtract);
     var data = [];
     //TODO add upper bound
+    //Push desired data into temporary storage array 
     for (var i = 0; i < sourceData.length; i++) {
-      if (sourceData[i] != null && new Date(sourceData[i].date).valueOf() > startDate.valueOf()) {
+      if (sourceData[i] != null && sourceData[i].date.valueOf() > startDate) {
         data.push(Object.create(sourceData[i]));
       }
     }

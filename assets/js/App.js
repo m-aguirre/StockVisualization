@@ -12,20 +12,23 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      inputSymbol: ''
+      inputSymbol: '',
+      timeSeriesData: '',
+      showOutlierDetector: false
     }
 
     this.getTimeSeriesData = this.getTimeSeriesData.bind(this);
   }
 
   getTimeSeriesData(symbol) {
+    let that = this;
     this.setState({inputSymbol: symbol} , () => {
-      console.log(this.state)
     //  var symbolRoute = 'search/' + symbol + '/';
       var symbolRoute = '/search/';
       axios.get(symbolRoute)
         .then( function(response) {
           console.log(response);
+          that.setState({timeSeriesData: response.data, showOutlierDetector: true});
         })
         .catch( function(error) {
           console.log("Error in GET Request: ", error);
@@ -42,7 +45,9 @@ class App extends React.Component {
         </p>
         <div className="stock-description">
           <h2>AAPL 2014</h2>
-          <OutlierDetector />
+          {this.state.showOutlierDetector ? <OutlierDetector /> : null}
+
+
         </div>
         <div className="graph-pane"></div>
         <hr></hr>

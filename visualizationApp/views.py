@@ -8,8 +8,7 @@ def index(request):
     return render(request, '../templates/index.html')
 
 def sendResponse(request):
-    string = "Response from Serverrrrr"
-    print('In Server')
+    data = "Response from Serverrrrr"
     try:
         df = quandl.get("WIKI/FB")
         data = df.reset_index().to_json(orient="records")
