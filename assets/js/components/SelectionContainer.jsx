@@ -14,6 +14,7 @@ class SelectionContainer extends React.Component {
 
         <AnalysisTypeSelector />
         <ModelSelector />
+        <div className="empty-div"></div>
       </div>
     )
   }

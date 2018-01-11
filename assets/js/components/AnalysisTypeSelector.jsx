@@ -22,7 +22,7 @@ class AnalysisTypeSelector extends React.Component {
         <form onSubmit={this.handleSubmit} onChange={this.handleChange}>
         <label className="selector-label">
           Analysis Type:
-          <select value={this.state.value}>
+          <select className="option-selector" value={this.state.value}>
             <option value="outlier">Outlier Detection</option>
           </select>
         </label>

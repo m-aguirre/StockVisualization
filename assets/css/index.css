@@ -28,7 +28,6 @@ body {
 .symbol-input-form {
   position: relative;
   left: 15%;
-
 }
 
 .invalid-symbol-notification {
@@ -38,8 +37,32 @@ body {
   left: 8%;
   bottom: 5px;
 }
+/************* ANALYSIS SELECTORS ******************/
 
+.selection-container {
+  display: inline-flex;
+}
 
+.selector-label {
+  display: block;
+  width: 33vw;
+}
+
+.option-selector {
+  display: block;
+  text-align: center;
+  position: relative;
+  left: 15vw;
+  width: 25vw;
+  height: 10vh;
+  margin-top: 5px;
+}
+
+.empty-div {
+  display: block;
+  width: 33vw;
+}
+/**********************  *****************/
 .regression-description {
   width: 70%;
   height: auto;
