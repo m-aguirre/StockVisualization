@@ -18,19 +18,21 @@ class OutlierDetector extends React.Component {
   }
 
   show(daysToSubtract) {
-    var sourceData = aaplData.aaplData;
+    //var sourceData = aaplData.aaplData;
+    var sourceData = this.props.timeSeriesData;
     var startDate = this.calculateStartDate(daysToSubtract);
     var data = [];
     //TODO add upper bound
-    //Push desired data into temporary storage array 
+    //Push desired data into temporary storage array
     for (var i = 0; i < sourceData.length; i++) {
-      if (sourceData[i] != null && sourceData[i].date.valueOf() > startDate) {
-        data.push(Object.create(sourceData[i]));
+      if (sourceData[i] != null && sourceData[i].Date.valueOf() > startDate) {
+        data.push(sourceData[i]);
       }
     }
 
-    var graph = new RegressionOutlierDetector(data, '2015-01-01', daysToSubtract);
-    graph.plotDataPoints();
+    //var graph = new RegressionOutlierDetector(data, '2015-01-01', daysToSubtract);
+    //graph.plotDataPoints();
+    console.log(data);
   }
 
   render() {

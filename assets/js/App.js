@@ -14,7 +14,8 @@ class App extends React.Component {
     this.state = {
       inputSymbol: '',
       timeSeriesData: '',
-      showOutlierDetector: false
+      showOutlierDetector: false,
+      invalidSymbolInput: false
     }
 
     this.getTimeSeriesData = this.getTimeSeriesData.bind(this);
@@ -32,6 +33,7 @@ class App extends React.Component {
         })
         .catch( function(error) {
           console.log("Error in GET Request: ", error);
+          that.setState({invalidSymbolInput: true});
         });
     });
   }
@@ -45,7 +47,7 @@ class App extends React.Component {
         </p>
         <div className="stock-description">
           <h2>AAPL 2014</h2>
-          {this.state.showOutlierDetector ? <OutlierDetector /> : null}
+          {this.state.showOutlierDetector ? <OutlierDetector timeSeriesData={this.state.timeSeriesData}/> : null}
 
 
         </div>
