@@ -23,7 +23,7 @@ class SymbolInputField extends React.Component {
   render() {
     return (
       <div className="symbol-input-field-container">
-        <form onSubmit={this.handleSubmit}>
+        <form className="symbol-input-form" onSubmit={this.handleSubmit}>
           <label>
             Symbol:
             <input type="text" name="symbol" value={this.state.inputText} onChange={this.handleChange} />
