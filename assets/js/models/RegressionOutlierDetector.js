@@ -5,8 +5,8 @@ class RegressionOutlierDetector {
   constructor(data, currentDate, daysToSubtract) {
     this.data = data;
     this.dataSummary = {
-      minClosingValue: d3.min(this.data, (d) => {return d.close}),
-      maxClosingValue: d3.max(this.data, (d) => {return d.close}),
+      minClosingValue: d3.min(this.data, (d) => {return d["Adj. Close"]}),
+      maxClosingValue: d3.max(this.data, (d) => {return d["Adj. Close"]}),
       mean: 0,
       sd: 0,
       intercept: 0,
@@ -17,7 +17,7 @@ class RegressionOutlierDetector {
     this.delayFactor = 8;
     this.endDate = currentDate;
 
-    this.xcoord = new DateScale(currentDate, daysToSubtract);
+    this.xcoord = new DateScale(daysToSubtract);
     this.xScale = this.xcoord.xScale;
 
     //creates y scale based on min and max closing prices
@@ -32,9 +32,9 @@ class RegressionOutlierDetector {
       end: {x: this.endDate, y: 0 }
     }
     d3.select('.viewport').remove();
-    this.calculateRegressionEquation(this.data);
-    this.calculateSD(this.data);
-    this.identifyOutliers(this.data, this.dataSummary.sd);
+    // this.calculateRegressionEquation(this.data);
+    // this.calculateSD(this.data);
+    // this.identifyOutliers(this.data, this.dataSummary.sd);
     this.addViewport();
   }
 

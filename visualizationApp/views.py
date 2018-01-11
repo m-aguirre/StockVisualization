@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+import os
 import quandl
 import pandas as pd
 
+quandl.ApiConfig.api_key = os.environ["quandl_key"]
 
 def index(request):
     return render(request, '../templates/index.html')
@@ -16,9 +18,3 @@ def sendResponse(request):
         data = 'NOT FOUND'
 
     return HttpResponse(data)
-
-
-def getQuandlData():
-    data = quandl.get('WIKI/AAPL')
-    print('Quandl data requested')
-    return data
