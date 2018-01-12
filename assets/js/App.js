@@ -28,12 +28,17 @@ class App extends React.Component {
   getTimeSeriesData(symbol) {
     let that = this;
     this.setState({inputSymbol: symbol} , () => {
-    //  var symbolRoute = 'search/' + symbol + '/';
-      var symbolRoute = '/search/';
+      var symbolRoute = 'search/' + symbol + '/';
+      console.log(symbolRoute);
+      //symbolRoute = '/search/';
       axios.get(symbolRoute)
         .then( function(response) {
           console.log(response);
-          that.setState({timeSeriesData: response.data, showSelectionContainer: true, invalidSymbolInput: false});
+          if (response.data === "NOT FOUND") {
+            that.setState({invalidSymbolInput: true})
+          } else {
+            that.setState({timeSeriesData: response.data, showSelectionContainer: true, invalidSymbolInput: false});
+          }
         })
         .catch( function(error) {
           console.log("Error in GET Request: ", error);

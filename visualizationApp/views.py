@@ -13,8 +13,15 @@ def index(request):
 
 def sendResponse(request):
     data = "Response from Serverrrrr"
+    print("Here we are")
+    print(request)
+    print(request.path.split('/')[2])
+    symbol = request.path.split('/')[2]
+    search_param = "WIKI/" + symbol
+    print(search_param)
+
     try:
-        df = quandl.get("WIKI/FB")
+        df = quandl.get(search_param)
         data = df.reset_index().to_json(orient="records")
     except:
         data = 'NOT FOUND'

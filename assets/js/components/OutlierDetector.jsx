@@ -9,6 +9,7 @@ class OutlierDetector extends React.Component {
 
     this.show = this.show.bind(this);
     this.calculateStartDate = this.calculateStartDate.bind(this);
+    this.show(365);
   }
 
   calculateStartDate(daysToSubtract) {
@@ -22,17 +23,14 @@ class OutlierDetector extends React.Component {
     var sourceData = this.props.timeSeriesData;
     var startDate = this.calculateStartDate(daysToSubtract);
     var data = [];
-    //TODO add upper bound
     //Push desired data into temporary storage array
     for (var i = 0; i < sourceData.length; i++) {
       if (sourceData[i] != null && sourceData[i].Date.valueOf() > startDate) {
         data.push(sourceData[i]);
       }
     }
-
     var graph = new RegressionOutlierDetector(data, daysToSubtract);
     graph.plotDataPoints();
-    console.log(data);
   }
 
   render() {
@@ -46,8 +44,8 @@ class OutlierDetector extends React.Component {
         </div>
         <div className="graph-pane"></div>
         <hr></hr>
+          <h2>Description</h2>
           <div className="regression-description">
-            <h2>Description</h2>
             <p>
               Linear regression is a common mathematical model used to predict
               values from roughly linear data sets.  It works by calculating an

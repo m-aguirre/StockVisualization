@@ -217,6 +217,8 @@ class RegressionOutlierDetector {
   }
 
 showInfo(outlier) {
+  var date = new Date(outlier.attr('date'));
+  var outlierDate = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
   var cx;
   if (outlier.attr('cx') > 350) {
     cx = outlier.attr('cx') - 115;
@@ -238,7 +240,7 @@ showInfo(outlier) {
   .attr('class', 'outlier-data')
   .attr("dx", function(d){return cx + 10})
   .attr("dy", function(d){return +outlier.attr('cy') + 20})
-  .text("Date: " + outlier.attr('date'))
+  .text("Date: " + outlierDate)
 
   svg.append('text')
   .attr('class', 'outlier-data')
