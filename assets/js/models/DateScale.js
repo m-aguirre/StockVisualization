@@ -27,7 +27,6 @@ class DateScale {
   calculateStartDate(daysToSubtract) {
     var currentDate = new Date();
     currentDate.setDate(currentDate.getDate() - daysToSubtract);
-    console.log('DATE: ', Date.parse(currentDate))
     return Date.parse(currentDate);
   }
 

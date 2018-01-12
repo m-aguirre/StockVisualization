@@ -79,7 +79,9 @@ class RegressionOutlierDetector {
       //number of days between current date and start date - don't ask where 86400000 came from
       //TODO adjust so it counts the number of BUSINESS days and not total days
       var x = (Math.floor((date - this.xcoord.startDate)/86400000));
+      console.log("x is: ", x);
       sumX += x;
+      console.log("sumX is: ", sumX);
       sumY += y;
       sumXY += (x * y);
       sumXSquared += (x * x);
