@@ -12,8 +12,8 @@ class AnalysisTypeSelector extends React.Component {
   handleSubmit() {
 
   }
-  handleChange() {
-
+  handleChange(e) {
+    this.setState({value: e.target.value});
   }
 
   render() {
