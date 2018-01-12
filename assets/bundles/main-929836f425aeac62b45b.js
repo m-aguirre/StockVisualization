@@ -5905,16 +5905,16 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var RegressionOutlierDetector = function () {
-  function RegressionOutlierDetector(data, currentDate, daysToSubtract) {
+  function RegressionOutlierDetector(data, daysToSubtract) {
     _classCallCheck(this, RegressionOutlierDetector);
 
     this.data = data;
     this.dataSummary = {
       minClosingValue: d3.min(this.data, function (d) {
-        return d.close;
+        return d["Adj. Close"];
       }),
       maxClosingValue: d3.max(this.data, function (d) {
-        return d.close;
+        return d["Adj. Close"];
       }),
       mean: 0,
       sd: 0,
@@ -5924,9 +5924,9 @@ var RegressionOutlierDetector = function () {
     this.daysToSubtract = daysToSubtract;
     //controls speed of animation
     this.delayFactor = 8;
-    this.endDate = currentDate;
+    this.endDate = Date.parse(new Date());
 
-    this.xcoord = new _DateScale2.default(currentDate, daysToSubtract);
+    this.xcoord = new _DateScale2.default(daysToSubtract);
     this.xScale = this.xcoord.xScale;
 
     //creates y scale based on min and max closing prices
@@ -5989,29 +5989,30 @@ var RegressionOutlierDetector = function () {
       var sumXY = 0;
       var sumXSquared = 0;
       var sumYSquared = 0;
-      var n = Object.keys(data).length;
+      //var n = Object.keys(data).length;
+      var n = data.length;
 
       data.forEach(function (d) {
-        var date = d.date;
-        var y = +d.close;
-        //number of days between current date and january first - don't ask where 86400000 came from
-        var x = Math.floor((Date.parse(date) - Date.parse(_this.xcoord.startDate.toISOString())) / 86400000);
+        var date = d["Date"];
+        var y = +d["Adj. Close"];
+        //number of days between current date and start date - don't ask where 86400000 came from
+        //TODO adjust so it counts the number of BUSINESS days and not total days
+        var x = Math.floor((date - _this.xcoord.startDate) / 86400000);
         sumX += x;
         sumY += y;
         sumXY += x * y;
         sumXSquared += x * x;
         sumYSquared += y * y;
       });
-
       var b0 = (sumY * sumXSquared - sumX * sumXY) / (n * sumXSquared - sumX * sumX);
       var b1 = (n * sumXY - sumX * sumY) / (n * sumXSquared - sumX * sumX);
 
       // x variables
       var minDateNumeric = d3.min(this.data, function (d) {
-        return Math.floor((Date.parse(d.date) - Date.parse(_this.xcoord.startDate.toISOString())) / 86400000);
+        return Math.floor((d["Date"] - _this.xcoord.startDate) / 86400000);
       });
       var maxDateNumeric = d3.max(this.data, function (d) {
-        return Math.floor((Date.parse(d.date) - Date.parse(_this.xcoord.startDate.toISOString())) / 86400000);
+        return Math.floor((d["Date"] - _this.xcoord.startDate) / 86400000);
       });
       var startY = b0 + minDateNumeric * b1;
       var endY = b0 + maxDateNumeric * b1;
@@ -6027,11 +6028,11 @@ var RegressionOutlierDetector = function () {
     key: "calculateSD",
     value: function calculateSD(data) {
       var mean = d3.mean(data, function (d) {
-        return d.close;
+        return d["Adj. Close"];
       });
       this.dataSummary.mean = mean;
       var sumLeastSquares = data.reduce(function (sum, d) {
-        return sum + (d.close - mean) * (d.close - mean);
+        return sum + (d["Adj. Close"] - mean) * (d["Adj. Close"] - mean);
       }, 0);
       this.dataSummary.sd = Math.sqrt(sumLeastSquares / (Object.keys(data).length - 1));
     }
@@ -6049,9 +6050,9 @@ var RegressionOutlierDetector = function () {
       }
       var days = 0;
       data.forEach(function (d) {
-        var pointOnLine = Math.floor((Date.parse(d.date) - Date.parse(_this2.xcoord.startDate.toISOString())) / 86400000) * _this2.dataSummary.regressionCoef + _this2.dataSummary.intercept;
+        var pointOnLine = Math.floor((d["Date"] - _this2.xcoord.startDate) / 86400000) * _this2.dataSummary.regressionCoef + _this2.dataSummary.intercept;
         //var pointOnLine = (days * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
-        if (+d.close > pointOnLine + sigma || +d.close < pointOnLine - sigma) {
+        if (+d["Adj. Close"] > pointOnLine + sigma || +d["Adj. Close"] < pointOnLine - sigma) {
           d.outlier = true;
         }
         days++;
@@ -6089,10 +6090,10 @@ var RegressionOutlierDetector = function () {
         var data = [];
         data.push(this.data[i]);
         dots.append("circle").data(data).attr("r", 0).attr("cx", function (d) {
-          return _this3.xScale(Date.parse(d.date));
+          return _this3.xScale(d["Date"]);
         }).attr("cy", function (d) {
-          return _this3.yScale(d.close);
-        }).attr('close', data[0].close).attr('date', data[0].date).attr('outlier', function (d) {
+          return _this3.yScale(d["Adj. Close"]);
+        }).attr('close', data[0]["Adj. Close"]).attr('date', data[0]["Date"]).attr('outlier', function (d) {
           return d.outlier ? true : false;
         }).on('mouseenter', function () {
           var dataPoint = d3.select(this);
@@ -6114,7 +6115,7 @@ var RegressionOutlierDetector = function () {
   }, {
     key: "drawRegressionLine",
     value: function drawRegressionLine() {
-      d3.select('.viewport').append('g').append('line').attr('x1', this.xScale(Date.parse(this.line.start.x))).attr('y1', this.yScale(this.line.start.y)).attr('x2', this.xScale(Date.parse(this.line.start.x))).attr('y2', this.yScale(this.line.start.y)).transition().duration(1000).attr('x2', this.xScale(Date.parse(this.line.end.x))).attr('y2', this.yScale(this.line.end.y)).style('stroke', 'black').style('stroke-width', 3);
+      d3.select('.viewport').append('g').append('line').attr('x1', this.xScale(this.line.start.x)).attr('y1', this.yScale(this.line.start.y)).attr('x2', this.xScale(this.line.start.x)).attr('y2', this.yScale(this.line.start.y)).transition().duration(1000).attr('x2', this.xScale(this.line.end.x)).attr('y2', this.yScale(this.line.end.y)).style('stroke', 'black').style('stroke-width', 3);
     }
   }, {
     key: "colorOutliersRed",
@@ -30429,9 +30430,21 @@ var _react = __webpack_require__(23);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _axios = __webpack_require__(507);
+
+var _axios2 = _interopRequireDefault(_axios);
+
 var _RegressionOutlierDetector = __webpack_require__(104);
 
 var _RegressionOutlierDetector2 = _interopRequireDefault(_RegressionOutlierDetector);
+
+var _SymbolInputField = __webpack_require__(499);
+
+var _SymbolInputField2 = _interopRequireDefault(_SymbolInputField);
+
+var _SelectionContainer = __webpack_require__(526);
+
+var _SelectionContainer2 = _interopRequireDefault(_SelectionContainer);
 
 var _dataFile = __webpack_require__(187);
 
@@ -30442,10 +30455,6 @@ var _OutlierDetector = __webpack_require__(493);
 var _OutlierDetector2 = _interopRequireDefault(_OutlierDetector);
 
 __webpack_require__(494);
-
-var _SymbolInputField = __webpack_require__(499);
-
-var _SymbolInputField2 = _interopRequireDefault(_SymbolInputField);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -30458,13 +30467,40 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var App = function (_React$Component) {
   _inherits(App, _React$Component);
 
-  function App() {
+  function App(props) {
     _classCallCheck(this, App);
 
-    return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+    _this.state = {
+      inputSymbol: '',
+      timeSeriesData: '',
+      invalidSymbolInput: false,
+      showSelectionContainer: false,
+      showOutlierDetector: false
+    };
+
+    _this.getTimeSeriesData = _this.getTimeSeriesData.bind(_this);
+    return _this;
   }
 
   _createClass(App, [{
+    key: 'getTimeSeriesData',
+    value: function getTimeSeriesData(symbol) {
+      var that = this;
+      this.setState({ inputSymbol: symbol }, function () {
+        //  var symbolRoute = 'search/' + symbol + '/';
+        var symbolRoute = '/search/';
+        _axios2.default.get(symbolRoute).then(function (response) {
+          console.log(response);
+          that.setState({ timeSeriesData: response.data, showSelectionContainer: true, invalidSymbolInput: false });
+        }).catch(function (error) {
+          console.log("Error in GET Request: ", error);
+          that.setState({ invalidSymbolInput: true });
+        });
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -30472,8 +30508,18 @@ var App = function (_React$Component) {
         { className: 'App' },
         _react2.default.createElement(
           'h1',
-          null,
-          'Outlier Detection With Linear Regression'
+          { className: 'main-header' },
+          'Stock Visualization'
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'input-form-container' },
+          _react2.default.createElement(_SymbolInputField2.default, { submitSymbol: this.getTimeSeriesData }),
+          this.state.invalidSymbolInput ? _react2.default.createElement(
+            'p',
+            { className: 'invalid-symbol-notification' },
+            ' Invalid symbol!'
+          ) : null
         ),
         _react2.default.createElement('p', { className: 'App-intro' }),
         _react2.default.createElement(
@@ -30482,40 +30528,14 @@ var App = function (_React$Component) {
           _react2.default.createElement(
             'h2',
             null,
-            'AAPL 2014'
+            this.state.inputSymbol
           ),
-          _react2.default.createElement(_OutlierDetector2.default, null)
-        ),
-        _react2.default.createElement('div', { className: 'graph-pane' }),
-        _react2.default.createElement('hr', null),
-        _react2.default.createElement(
-          'div',
-          { className: 'regression-description' },
-          _react2.default.createElement(
-            'h2',
-            null,
-            'Description'
-          ),
-          _react2.default.createElement(
+          this.state.showSelectionContainer ? _react2.default.createElement(_SelectionContainer2.default, null) : _react2.default.createElement(
             'p',
             null,
-            'Linear regression is a common mathematical model used to predict values from roughly linear data sets.  It works by calculating an equation for a line that has the minimum total vertical distance from itself to all the points in a data set. This "best fit line" and its associated equation can be used to describe data, as well as predict values based on changes to independent variables. We tend to expect that our data is normally distributed about the regression line, and thus have a basis for classifying a data point as an outlier numerically by relating its vertical distance from the line to the data set\'s standard deviation.  Generally from a normal distribution, 95% of data is within 2 standard deviations from the mean, so classifying data points that are more than 2 standard deviations above or below our regression line is a good baseline to start at.'
+            'Please enter a valid stock symbol to get started (Ex: AAPL, TSLA, FB, etc.) '
           ),
-          _react2.default.createElement(
-            'p',
-            null,
-            'In the context of stock values, detecting outliers is useful when deciding to buy or sell a stock. A multi day succession of outlier closing prices may indicate that a stock is poised to revert to its mean, or that it is approaching a resistance/breakout point, or one of a million other possibilities. Outlier status is only one small part that should go into the decision of buying or selling a stock.'
-          ),
-          _react2.default.createElement(
-            'p',
-            null,
-            'For more information about linear regression and its relation to stock market data, visit ',
-            _react2.default.createElement(
-              'a',
-              { href: 'http://www.investopedia.com/articles/trading/09/linear-regression-time-price.asp' },
-              'investopedia'
-            )
-          )
+          this.state.showOutlierDetector ? _react2.default.createElement(_OutlierDetector2.default, { timeSeriesData: this.state.timeSeriesData }) : null
         )
       );
     }
@@ -43623,24 +43643,42 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var DateScale = function () {
-  function DateScale(currentDate, daysToSubtract) {
+  function DateScale(daysToSubtract) {
     _classCallCheck(this, DateScale);
 
-    this.startDate = this.calculateStartDate(currentDate, daysToSubtract);
+    this.startDate = this.calculateStartDate(daysToSubtract);
 
     //creates linearly spaced scale for x-coordinate
-    this.xScale = d3.scaleTime().domain([new Date(Date.parse(this.startDate)), new Date(Date.parse(currentDate))]).range([0, 600]);
+    this.xScale = d3.scaleTime().domain([new Date(this.startDate), new Date()]).range([0, 600]);
 
     this.numTicks = this.findNumberOfTicks(daysToSubtract);
   }
 
+  //NEW startDate calculator
+  // calculateStartDate(daysToSubtract) {
+  //   var currentDate = new Date();
+  //   currentDate.setDate(currentDate.getDate() - daysToSubtract);
+  //   return new Date(currentDate);
+  // }
+
+  //returns numeric
+
+
   _createClass(DateScale, [{
     key: "calculateStartDate",
-    value: function calculateStartDate(endDate, daysToSubtract) {
-      var date = new Date(endDate);
-      date.setDate(date.getDate() - daysToSubtract);
-      return new Date(date);
+    value: function calculateStartDate(daysToSubtract) {
+      var currentDate = new Date();
+      currentDate.setDate(currentDate.getDate() - daysToSubtract);
+      console.log('DATE: ', Date.parse(currentDate));
+      return Date.parse(currentDate);
     }
+
+    // calculateStartDate(endDate, daysToSubtract) {
+    //   var date = new Date(endDate);
+    //   date.setDate(date.getDate() - daysToSubtract);
+    //   return new Date(date);
+    // }
+
   }, {
     key: "findNumberOfTicks",
     value: function findNumberOfTicks(daysToSubtract) {
@@ -43710,26 +43748,29 @@ var OutlierDetector = function (_React$Component) {
 
   _createClass(OutlierDetector, [{
     key: 'calculateStartDate',
-    value: function calculateStartDate(endDate, daysToSubtract) {
-      var date = new Date(endDate);
-      date.setDate(date.getDate() - daysToSubtract);
-      return new Date(date);
+    value: function calculateStartDate(daysToSubtract) {
+      var currentDate = new Date();
+      currentDate.setDate(currentDate.getDate() - daysToSubtract);
+      return Date.parse(currentDate);
     }
   }, {
     key: 'show',
     value: function show(daysToSubtract) {
-      var sourceData = _dataFile2.default.aaplData;
-      var startDate = this.calculateStartDate('2015-01-01', daysToSubtract);
+      //var sourceData = aaplData.aaplData;
+      var sourceData = this.props.timeSeriesData;
+      var startDate = this.calculateStartDate(daysToSubtract);
       var data = [];
       //TODO add upper bound
+      //Push desired data into temporary storage array
       for (var i = 0; i < sourceData.length; i++) {
-        if (sourceData[i] != null && new Date(sourceData[i].date).valueOf() > startDate.valueOf()) {
-          data.push(Object.create(sourceData[i]));
+        if (sourceData[i] != null && sourceData[i].Date.valueOf() > startDate) {
+          data.push(sourceData[i]);
         }
       }
 
-      var graph = new _RegressionOutlierDetector2.default(data, '2015-01-01', daysToSubtract);
+      var graph = new _RegressionOutlierDetector2.default(data, daysToSubtract);
       graph.plotDataPoints();
+      console.log(data);
     }
   }, {
     key: 'render',
@@ -43738,49 +43779,84 @@ var OutlierDetector = function (_React$Component) {
 
       return _react2.default.createElement(
         'div',
-        { className: 'time-interval-button-container' },
+        null,
         _react2.default.createElement(
           'div',
-          { className: 'time-interval-button', onClick: function onClick() {
-              _this2.show(60);
-            } },
+          { className: 'time-interval-button-container' },
           _react2.default.createElement(
-            'p',
-            null,
-            '2M'
+            'div',
+            { className: 'time-interval-button', onClick: function onClick() {
+                _this2.show(60);
+              } },
+            _react2.default.createElement(
+              'p',
+              null,
+              '2M'
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'time-interval-button', onClick: function onClick() {
+                _this2.show(90);
+              } },
+            _react2.default.createElement(
+              'p',
+              null,
+              '3M'
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'time-interval-button', onClick: function onClick() {
+                _this2.show(180);
+              } },
+            _react2.default.createElement(
+              'p',
+              null,
+              '6M'
+            )
+          ),
+          _react2.default.createElement(
+            'div',
+            { className: 'time-interval-button', onClick: function onClick() {
+                _this2.show(365);
+              } },
+            _react2.default.createElement(
+              'p',
+              null,
+              '1Y'
+            )
           )
         ),
+        _react2.default.createElement('div', { className: 'graph-pane' }),
+        _react2.default.createElement('hr', null),
         _react2.default.createElement(
           'div',
-          { className: 'time-interval-button', onClick: function onClick() {
-              _this2.show(90);
-            } },
+          { className: 'regression-description' },
+          _react2.default.createElement(
+            'h2',
+            null,
+            'Description'
+          ),
           _react2.default.createElement(
             'p',
             null,
-            '3M'
-          )
-        ),
-        _react2.default.createElement(
-          'div',
-          { className: 'time-interval-button', onClick: function onClick() {
-              _this2.show(180);
-            } },
+            'Linear regression is a common mathematical model used to predict values from roughly linear data sets.  It works by calculating an equation for a line that has the minimum total vertical distance from itself to all the points in a data set. This "best fit line" and its associated equation can be used to describe data, as well as predict values based on changes to independent variables. We tend to expect that our data is normally distributed about the regression line, and thus have a basis for classifying a data point as an outlier numerically by relating its vertical distance from the line to the data set\'s standard deviation.  Generally from a normal distribution, 95% of data is within 2 standard deviations from the mean, so classifying data points that are more than 2 standard deviations above or below our regression line is a good baseline to start at.'
+          ),
           _react2.default.createElement(
             'p',
             null,
-            '6M'
-          )
-        ),
-        _react2.default.createElement(
-          'div',
-          { className: 'time-interval-button', onClick: function onClick() {
-              _this2.show(365);
-            } },
+            'In the context of stock values, detecting outliers is useful when deciding to buy or sell a stock. A multi day succession of outlier closing prices may indicate that a stock is poised to revert to its mean, or that it is approaching a resistance/breakout point, or one of a million other possibilities. Outlier status is only one small part that should go into the decision of buying or selling a stock.'
+          ),
           _react2.default.createElement(
             'p',
             null,
-            '1Y'
+            'For more information about linear regression and its relation to stock market data, visit ',
+            _react2.default.createElement(
+              'a',
+              { href: 'http://www.investopedia.com/articles/trading/09/linear-regression-time-price.asp' },
+              'investopedia'
+            )
           )
         )
       );
@@ -43832,7 +43908,7 @@ exports = module.exports = __webpack_require__(496)(undefined);
 
 
 // module
-exports.push([module.i, "body {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n}\n\n.regression-description {\n  width: 70%;\n  height: auto;\n  margin: auto;\n}\n\n.graph-pane {\n  width: 100vw;\n  height: 500px;\n  margin: auto;\n  overflow: visible;\n  padding-left: 20px;\n}\n\n\n.stock-description  {\n    width: 100vw;\n    height: auto;\n    display: inline-block;\n    text-align: center;\n\n}\n.stock-description h2 {\n  position: relative;\n  display: inline-block;\n  float: left;\n  margin-left: 20px;\n}\n\n.viewport {\n  margin-left: 10%;\n  overflow: visible;\n}\n\n.outlier-info-box {\n  stroke: black;\n  fill: white;\n\n}\n\n.outlier-data {\n  overflow: hidden;\n  color: red;\n  font-size: 14px;\n}\n\n.time-interval-button-container {\n  width: 70vw !important;\n  height: auto;\n  display: inline-flex;\n  margin: 0;\n\n}\n\n.time-interval-button {\n  min-width: 10vw;\n  height: 5vh;\n  background-color: #41a6f4;\n  color: white;\n  border-radius: 5px;\n  border-style: double;\n  margin: 3%;\n  align-items: center;\n  line-height: 2.5vh;\n  text-align: center;\n  cursor: pointer;\n}\n\n.time-interval-button :hover {\n  transition: opacity 0.25s ease-in-out;\n  opacity: 0.75;\n}\n.time-interval-button p {\n  transform: translate(0, -50%);\n}\n", ""]);
+exports.push([module.i, "body {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n}\n\n.main-header {\n  text-align: center;\n  background-color: #0187af;\n  margin-top: 0;\n  margin-bottom: 0;\n  width: 100vw;\n  height: 7.5vh;\n  color: white;\n  line-height: 7.5vh;\n}\n\n.input-form-container {\n  margin-top: 0;\n  width: 100%;\n  height: 8%;\n  text-align: center;\n  padding-top: 3%;\n  line-height: 8%;\n  display: flex;\n  flex-direction: row;\n}\n.symbol-input-form {\n  position: relative;\n  left: 15%;\n}\n\n.invalid-symbol-notification {\n  color: red;\n  margin-left: 2%;\n  position: relative;\n  left: 8%;\n  bottom: 5px;\n  animation: blinker 1s linear infinite;\n}\n\n@keyframes blinker {\n  50% { opacity: 0; }\n}\n/************* ANALYSIS SELECTORS ******************/\n\n.selection-container {\n  display: inline-flex;\n}\n\n.selector-label {\n  display: block;\n  width: 33vw;\n}\n\n.option-selector {\n  display: block;\n  text-align: center;\n  position: relative;\n  left: 10vw;\n  width: 25vw;\n  height: 8vh;\n  margin-top: 5px;\n}\n\n.selector-option {\n  width: 25vw;\n  height: 10vh;\n}\n\n.empty-div {\n  display: block;\n  width: 33vw;\n}\n/**********************  *****************/\n.regression-description {\n  width: 70%;\n  height: auto;\n  margin: auto;\n}\n\n.graph-pane {\n  width: 100vw;\n  height: 500px;\n  margin: auto;\n  overflow: visible;\n  padding-left: 20px;\n}\n\n\n.stock-description  {\n    width: 100vw;\n    height: auto;\n    display: inline-block;\n    text-align: center;\n\n}\n.stock-description h2 {\n  position: relative;\n  display: inline-block;\n  float: left;\n  margin-left: 20px;\n}\n\n.viewport {\n  margin-left: 10%;\n  overflow: visible;\n}\n\n.outlier-info-box {\n  stroke: black;\n  fill: white;\n\n}\n\n.outlier-data {\n  overflow: hidden;\n  color: red;\n  font-size: 14px;\n}\n\n.time-interval-button-container {\n  width: 70vw !important;\n  height: auto;\n  display: inline-flex;\n  margin: 0;\n\n}\n\n.time-interval-button {\n  min-width: 10vw;\n  height: 5vh;\n  background-color: #41a6f4;\n  color: white;\n  border-radius: 5px;\n  border-style: double;\n  margin: 3%;\n  align-items: center;\n  line-height: 2.5vh;\n  text-align: center;\n  cursor: pointer;\n}\n\n.time-interval-button :hover {\n  transition: opacity 0.25s ease-in-out;\n  opacity: 0.75;\n}\n.time-interval-button p {\n  transform: translate(0, -50%);\n}\n", ""]);
 
 // exports
 
@@ -44417,25 +44493,44 @@ var SymbolInputField = function (_React$Component) {
   function SymbolInputField(props) {
     _classCallCheck(this, SymbolInputField);
 
-    return _possibleConstructorReturn(this, (SymbolInputField.__proto__ || Object.getPrototypeOf(SymbolInputField)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (SymbolInputField.__proto__ || Object.getPrototypeOf(SymbolInputField)).call(this, props));
+
+    _this.state = {
+      inputText: ''
+    };
+
+    _this.handleChange = _this.handleChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    return _this;
   }
 
   _createClass(SymbolInputField, [{
-    key: "render",
+    key: 'handleChange',
+    value: function handleChange(e) {
+      this.setState({ inputText: e.target.value.toUpperCase() });
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(e) {
+      this.props.submitSymbol(this.state.inputText);
+      e.preventDefault();
+    }
+  }, {
+    key: 'render',
     value: function render() {
       return _react2.default.createElement(
-        "div",
-        { className: "symbol-input-field-container" },
+        'div',
+        { className: 'symbol-input-field-container' },
         _react2.default.createElement(
-          "form",
-          null,
+          'form',
+          { className: 'symbol-input-form', onSubmit: this.handleSubmit },
           _react2.default.createElement(
-            "label",
+            'label',
             null,
-            "Symbol:",
-            _react2.default.createElement("input", { type: "text", name: "symbol" })
+            'Symbol:',
+            _react2.default.createElement('input', { type: 'text', name: 'symbol', value: this.state.inputText, onChange: this.handleChange })
           ),
-          _react2.default.createElement("input", { type: "submit", value: "Submit" })
+          _react2.default.createElement('input', { type: 'submit', value: 'Submit' })
         )
       );
     }
@@ -44445,6 +44540,1804 @@ var SymbolInputField = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = SymbolInputField;
+
+/***/ }),
+/* 500 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var bind = __webpack_require__(502);
+var isBuffer = __webpack_require__(509);
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+ * Determine if a value is an Array
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Array, otherwise false
+ */
+function isArray(val) {
+  return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  var result;
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
+  return result;
+}
+
+/**
+ * Determine if a value is a String
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a String, otherwise false
+ */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+ * Determine if a value is a Number
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Number, otherwise false
+ */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is an Object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an Object, otherwise false
+ */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+ * Determine if a value is a Date
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Date, otherwise false
+ */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+ * Determine if a value is a File
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a File, otherwise false
+ */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+ * Determine if a value is a Blob
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Blob, otherwise false
+ */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+ * Determine if a value is a Function
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Function, otherwise false
+ */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+ * Determine if a value is a Stream
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Stream, otherwise false
+ */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+ * Determine if a value is a URLSearchParams object
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+ */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+ * Trim excess whitespace off the beginning and end of a string
+ *
+ * @param {String} str The String to trim
+ * @returns {String} The String freed of excess whitespace
+ */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+ * Determine if we're running in a standard browser environment
+ *
+ * This allows axios to run in a web worker, and react-native.
+ * Both environments support XMLHttpRequest, but not fully standard globals.
+ *
+ * web workers:
+ *  typeof window -> undefined
+ *  typeof document -> undefined
+ *
+ * react-native:
+ *  navigator.product -> 'ReactNative'
+ */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined'
+  );
+}
+
+/**
+ * Iterate over an Array or an Object invoking a function for each item.
+ *
+ * If `obj` is an Array callback will be called passing
+ * the value, index, and complete array for each item.
+ *
+ * If 'obj' is an Object callback will be called passing
+ * the value, key, and complete object for each property.
+ *
+ * @param {Object|Array} obj The object to iterate
+ * @param {Function} fn The callback to invoke for each item
+ */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+ * Accepts varargs expecting each argument to be an object, then
+ * immutably merges the properties of each object and returns result.
+ *
+ * When multiple objects contain the same key the later object in
+ * the arguments list will take precedence.
+ *
+ * Example:
+ *
+ * ```js
+ * var result = merge({foo: 123}, {foo: 456});
+ * console.log(result.foo); // outputs 456
+ * ```
+ *
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function merge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = merge(result[key], val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+ * Extends object a by mutably adding to it the properties of object b.
+ *
+ * @param {Object} a The object to be extended
+ * @param {Object} b The object to copy properties from
+ * @param {Object} thisArg The object to bind function to
+ * @return {Object} The resulting value of object a
+ */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  extend: extend,
+  trim: trim
+};
+
+
+/***/ }),
+/* 501 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(500);
+var normalizeHeaderName = __webpack_require__(511);
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(503);
+  } else if (typeof process !== 'undefined') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(503);
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+
+/***/ }),
+/* 502 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+
+/***/ }),
+/* 503 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(500);
+var settle = __webpack_require__(512);
+var buildURL = __webpack_require__(514);
+var parseHeaders = __webpack_require__(515);
+var isURLSameOrigin = __webpack_require__(516);
+var createError = __webpack_require__(504);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(517);
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+    var loadEvent = 'onreadystatechange';
+    var xDomain = false;
+
+    // For IE 8/9 CORS support
+    // Only supports POST and GET calls and doesn't returns the response headers.
+    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
+    if (process.env.NODE_ENV !== 'test' &&
+        typeof window !== 'undefined' &&
+        window.XDomainRequest && !('withCredentials' in request) &&
+        !isURLSameOrigin(config.url)) {
+      request = new window.XDomainRequest();
+      loadEvent = 'onload';
+      xDomain = true;
+      request.onprogress = function handleProgress() {};
+      request.ontimeout = function handleTimeout() {};
+    }
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request[loadEvent] = function handleLoad() {
+      if (!request || (request.readyState !== 4 && !xDomain)) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        // IE sends 1223 instead of 204 (https://github.com/axios/axios/issues/201)
+        status: request.status === 1223 ? 204 : request.status,
+        statusText: request.status === 1223 ? 'No Content' : request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies = __webpack_require__(518);
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+          cookies.read(config.xsrfCookieName) :
+          undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (config.withCredentials) {
+      request.withCredentials = true;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+        if (config.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+
+/***/ }),
+/* 504 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var enhanceError = __webpack_require__(513);
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+
+/***/ }),
+/* 505 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+
+/***/ }),
+/* 506 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
+
+
+/***/ }),
+/* 507 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(508);
+
+/***/ }),
+/* 508 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+var bind = __webpack_require__(502);
+var Axios = __webpack_require__(510);
+var defaults = __webpack_require__(501);
+
+/**
+ * Create an instance of Axios
+ *
+ * @param {Object} defaultConfig The default config for the instance
+ * @return {Axios} A new instance of Axios
+ */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Factory for creating new instances
+axios.create = function create(instanceConfig) {
+  return createInstance(utils.merge(defaults, instanceConfig));
+};
+
+// Expose Cancel & CancelToken
+axios.Cancel = __webpack_require__(506);
+axios.CancelToken = __webpack_require__(524);
+axios.isCancel = __webpack_require__(505);
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = __webpack_require__(525);
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+
+/***/ }),
+/* 509 */
+/***/ (function(module, exports) {
+
+/*!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ */
+
+// The _isBuffer check is for Safari 5-7 support, because it's missing
+// Object.prototype.constructor. Remove this eventually
+module.exports = function (obj) {
+  return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
+}
+
+function isBuffer (obj) {
+  return !!obj.constructor && typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
+}
+
+// For Node v0.10 support. Remove this eventually.
+function isSlowBuffer (obj) {
+  return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
+}
+
+
+/***/ }),
+/* 510 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var defaults = __webpack_require__(501);
+var utils = __webpack_require__(500);
+var InterceptorManager = __webpack_require__(519);
+var dispatchRequest = __webpack_require__(520);
+
+/**
+ * Create a new instance of Axios
+ *
+ * @param {Object} instanceConfig The default config for the instance
+ */
+function Axios(instanceConfig) {
+  this.defaults = instanceConfig;
+  this.interceptors = {
+    request: new InterceptorManager(),
+    response: new InterceptorManager()
+  };
+}
+
+/**
+ * Dispatch a request
+ *
+ * @param {Object} config The config specific for this request (merged with this.defaults)
+ */
+Axios.prototype.request = function request(config) {
+  /*eslint no-param-reassign:0*/
+  // Allow for axios('example/url'[, config]) a la fetch API
+  if (typeof config === 'string') {
+    config = utils.merge({
+      url: arguments[0]
+    }, arguments[1]);
+  }
+
+  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
+  config.method = config.method.toLowerCase();
+
+  // Hook up interceptors middleware
+  var chain = [dispatchRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+    chain.push(interceptor.fulfilled, interceptor.rejected);
+  });
+
+  while (chain.length) {
+    promise = promise.then(chain.shift(), chain.shift());
+  }
+
+  return promise;
+};
+
+// Provide aliases for supported request methods
+utils.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url
+    }));
+  };
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  /*eslint func-names:0*/
+  Axios.prototype[method] = function(url, data, config) {
+    return this.request(utils.merge(config || {}, {
+      method: method,
+      url: url,
+      data: data
+    }));
+  };
+});
+
+module.exports = Axios;
+
+
+/***/ }),
+/* 511 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+
+module.exports = function normalizeHeaderName(headers, normalizedName) {
+  utils.forEach(headers, function processHeader(value, name) {
+    if (name !== normalizedName && name.toUpperCase() === normalizedName.toUpperCase()) {
+      headers[normalizedName] = value;
+      delete headers[name];
+    }
+  });
+};
+
+
+/***/ }),
+/* 512 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var createError = __webpack_require__(504);
+
+/**
+ * Resolve or reject a Promise based on response status.
+ *
+ * @param {Function} resolve A function that resolves the promise.
+ * @param {Function} reject A function that rejects the promise.
+ * @param {object} response The response.
+ */
+module.exports = function settle(resolve, reject, response) {
+  var validateStatus = response.config.validateStatus;
+  // Note: status is not exposed by XDomainRequest
+  if (!response.status || !validateStatus || validateStatus(response.status)) {
+    resolve(response);
+  } else {
+    reject(createError(
+      'Request failed with status code ' + response.status,
+      response.config,
+      null,
+      response.request,
+      response
+    ));
+  }
+};
+
+
+/***/ }),
+/* 513 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Update an Error with the specified config, error code, and response.
+ *
+ * @param {Error} error The error to update.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The error.
+ */
+module.exports = function enhanceError(error, config, code, request, response) {
+  error.config = config;
+  if (code) {
+    error.code = code;
+  }
+  error.request = request;
+  error.response = response;
+  return error;
+};
+
+
+/***/ }),
+/* 514 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%40/gi, '@').
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      }
+
+      if (!utils.isArray(val)) {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+
+/***/ }),
+/* 515 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+
+// Headers whose duplicates are ignored by node
+// c.f. https://nodejs.org/api/http.html#http_message_headers
+var ignoreDuplicateOf = [
+  'age', 'authorization', 'content-length', 'content-type', 'etag',
+  'expires', 'from', 'host', 'if-modified-since', 'if-unmodified-since',
+  'last-modified', 'location', 'max-forwards', 'proxy-authorization',
+  'referer', 'retry-after', 'user-agent'
+];
+
+/**
+ * Parse headers into an object
+ *
+ * ```
+ * Date: Wed, 27 Aug 2014 08:58:49 GMT
+ * Content-Type: application/json
+ * Connection: keep-alive
+ * Transfer-Encoding: chunked
+ * ```
+ *
+ * @param {String} headers Headers needing to be parsed
+ * @returns {Object} Headers parsed into an object
+ */
+module.exports = function parseHeaders(headers) {
+  var parsed = {};
+  var key;
+  var val;
+  var i;
+
+  if (!headers) { return parsed; }
+
+  utils.forEach(headers.split('\n'), function parser(line) {
+    i = line.indexOf(':');
+    key = utils.trim(line.substr(0, i)).toLowerCase();
+    val = utils.trim(line.substr(i + 1));
+
+    if (key) {
+      if (parsed[key] && ignoreDuplicateOf.indexOf(key) >= 0) {
+        return;
+      }
+      if (key === 'set-cookie') {
+        parsed[key] = (parsed[key] ? parsed[key] : []).concat([val]);
+      } else {
+        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+      }
+    }
+  });
+
+  return parsed;
+};
+
+
+/***/ }),
+/* 516 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs have full support of the APIs needed to test
+  // whether the request URL is of the same origin as current location.
+  (function standardBrowserEnv() {
+    var msie = /(msie|trident)/i.test(navigator.userAgent);
+    var urlParsingNode = document.createElement('a');
+    var originURL;
+
+    /**
+    * Parse a URL to discover it's components
+    *
+    * @param {String} url The URL to be parsed
+    * @returns {Object}
+    */
+    function resolveURL(url) {
+      var href = url;
+
+      if (msie) {
+        // IE needs attribute set twice to normalize properties
+        urlParsingNode.setAttribute('href', href);
+        href = urlParsingNode.href;
+      }
+
+      urlParsingNode.setAttribute('href', href);
+
+      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+      return {
+        href: urlParsingNode.href,
+        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+        host: urlParsingNode.host,
+        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+        hostname: urlParsingNode.hostname,
+        port: urlParsingNode.port,
+        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+                  urlParsingNode.pathname :
+                  '/' + urlParsingNode.pathname
+      };
+    }
+
+    originURL = resolveURL(window.location.href);
+
+    /**
+    * Determine if a URL shares the same origin as the current location
+    *
+    * @param {String} requestURL The URL to test
+    * @returns {boolean} True if URL shares the same origin, otherwise false
+    */
+    return function isURLSameOrigin(requestURL) {
+      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+      return (parsed.protocol === originURL.protocol &&
+            parsed.host === originURL.host);
+    };
+  })() :
+
+  // Non standard browser envs (web workers, react-native) lack needed support.
+  (function nonStandardBrowserEnv() {
+    return function isURLSameOrigin() {
+      return true;
+    };
+  })()
+);
+
+
+/***/ }),
+/* 517 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
+
+var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+function E() {
+  this.message = 'String contains an invalid character';
+}
+E.prototype = new Error;
+E.prototype.code = 5;
+E.prototype.name = 'InvalidCharacterError';
+
+function btoa(input) {
+  var str = String(input);
+  var output = '';
+  for (
+    // initialize result and counter
+    var block, charCode, idx = 0, map = chars;
+    // if the next str index does not exist:
+    //   change the mapping table to "="
+    //   check if d has no fractional digits
+    str.charAt(idx | 0) || (map = '=', idx % 1);
+    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+  ) {
+    charCode = str.charCodeAt(idx += 3 / 4);
+    if (charCode > 0xFF) {
+      throw new E();
+    }
+    block = block << 8 | charCode;
+  }
+  return output;
+}
+
+module.exports = btoa;
+
+
+/***/ }),
+/* 518 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+
+module.exports = (
+  utils.isStandardBrowserEnv() ?
+
+  // Standard browser envs support document.cookie
+  (function standardBrowserEnv() {
+    return {
+      write: function write(name, value, expires, path, domain, secure) {
+        var cookie = [];
+        cookie.push(name + '=' + encodeURIComponent(value));
+
+        if (utils.isNumber(expires)) {
+          cookie.push('expires=' + new Date(expires).toGMTString());
+        }
+
+        if (utils.isString(path)) {
+          cookie.push('path=' + path);
+        }
+
+        if (utils.isString(domain)) {
+          cookie.push('domain=' + domain);
+        }
+
+        if (secure === true) {
+          cookie.push('secure');
+        }
+
+        document.cookie = cookie.join('; ');
+      },
+
+      read: function read(name) {
+        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+        return (match ? decodeURIComponent(match[3]) : null);
+      },
+
+      remove: function remove(name) {
+        this.write(name, '', Date.now() - 86400000);
+      }
+    };
+  })() :
+
+  // Non standard browser env (web workers, react-native) lack needed support.
+  (function nonStandardBrowserEnv() {
+    return {
+      write: function write() {},
+      read: function read() { return null; },
+      remove: function remove() {}
+    };
+  })()
+);
+
+
+/***/ }),
+/* 519 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+
+/***/ }),
+/* 520 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+var transformData = __webpack_require__(521);
+var isCancel = __webpack_require__(505);
+var defaults = __webpack_require__(501);
+var isAbsoluteURL = __webpack_require__(522);
+var combineURLs = __webpack_require__(523);
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Support baseURL config
+  if (config.baseURL && !isAbsoluteURL(config.url)) {
+    config.url = combineURLs(config.baseURL, config.url);
+  }
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers || {}
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+
+/***/ }),
+/* 521 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(500);
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+
+/***/ }),
+/* 522 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+};
+
+
+/***/ }),
+/* 523 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+
+/***/ }),
+/* 524 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var Cancel = __webpack_require__(506);
+
+/**
+ * A `CancelToken` is an object that can be used to request cancellation of an operation.
+ *
+ * @class
+ * @param {Function} executor The executor function.
+ */
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    if (token.reason) {
+      // Cancellation has already been requested
+      return;
+    }
+
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+CancelToken.prototype.throwIfRequested = function throwIfRequested() {
+  if (this.reason) {
+    throw this.reason;
+  }
+};
+
+/**
+ * Returns an object that contains a new `CancelToken` and a function that, when called,
+ * cancels the `CancelToken`.
+ */
+CancelToken.source = function source() {
+  var cancel;
+  var token = new CancelToken(function executor(c) {
+    cancel = c;
+  });
+  return {
+    token: token,
+    cancel: cancel
+  };
+};
+
+module.exports = CancelToken;
+
+
+/***/ }),
+/* 525 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Syntactic sugar for invoking a function and expanding an array for arguments.
+ *
+ * Common use case would be to use `Function.prototype.apply`.
+ *
+ *  ```js
+ *  function f(x, y, z) {}
+ *  var args = [1, 2, 3];
+ *  f.apply(null, args);
+ *  ```
+ *
+ * With `spread` this example can be re-written.
+ *
+ *  ```js
+ *  spread(function(x, y, z) {})([1, 2, 3]);
+ *  ```
+ *
+ * @param {Function} callback
+ * @returns {Function}
+ */
+module.exports = function spread(callback) {
+  return function wrap(arr) {
+    return callback.apply(null, arr);
+  };
+};
+
+
+/***/ }),
+/* 526 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(23);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _AnalysisTypeSelector = __webpack_require__(527);
+
+var _AnalysisTypeSelector2 = _interopRequireDefault(_AnalysisTypeSelector);
+
+var _ModelSelector = __webpack_require__(528);
+
+var _ModelSelector2 = _interopRequireDefault(_ModelSelector);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SelectionContainer = function (_React$Component) {
+  _inherits(SelectionContainer, _React$Component);
+
+  function SelectionContainer(props) {
+    _classCallCheck(this, SelectionContainer);
+
+    return _possibleConstructorReturn(this, (SelectionContainer.__proto__ || Object.getPrototypeOf(SelectionContainer)).call(this, props));
+  }
+
+  _createClass(SelectionContainer, [{
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'selection-container' },
+        _react2.default.createElement(_AnalysisTypeSelector2.default, null),
+        _react2.default.createElement(_ModelSelector2.default, null),
+        _react2.default.createElement('div', { className: 'empty-div' })
+      );
+    }
+  }]);
+
+  return SelectionContainer;
+}(_react2.default.Component);
+
+exports.default = SelectionContainer;
+
+/***/ }),
+/* 527 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(23);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+//
+var AnalysisTypeSelector = function (_React$Component) {
+  _inherits(AnalysisTypeSelector, _React$Component);
+
+  function AnalysisTypeSelector(props) {
+    _classCallCheck(this, AnalysisTypeSelector);
+
+    var _this = _possibleConstructorReturn(this, (AnalysisTypeSelector.__proto__ || Object.getPrototypeOf(AnalysisTypeSelector)).call(this, props));
+
+    _this.state = {
+      value: 'select'
+    };
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    _this.handleChange = _this.handleChange.bind(_this);
+    return _this;
+  }
+
+  _createClass(AnalysisTypeSelector, [{
+    key: 'handleSubmit',
+    value: function handleSubmit() {}
+  }, {
+    key: 'handleChange',
+    value: function handleChange() {}
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'form',
+          { onSubmit: this.handleSubmit, onChange: this.handleChange },
+          _react2.default.createElement(
+            'label',
+            { className: 'selector-label' },
+            'Analysis Type:',
+            _react2.default.createElement(
+              'select',
+              { className: 'option-selector', value: this.state.value, disabled: true },
+              _react2.default.createElement(
+                'option',
+                { className: 'selector-option', value: 'outlier' },
+                'Outlier Detection'
+              )
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return AnalysisTypeSelector;
+}(_react2.default.Component);
+
+exports.default = AnalysisTypeSelector;
+
+/***/ }),
+/* 528 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(23);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ModelSelector = function (_React$Component) {
+  _inherits(ModelSelector, _React$Component);
+
+  function ModelSelector(props) {
+    _classCallCheck(this, ModelSelector);
+
+    var _this = _possibleConstructorReturn(this, (ModelSelector.__proto__ || Object.getPrototypeOf(ModelSelector)).call(this, props));
+
+    _this.state = {
+      value: 'select'
+    };
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    _this.handleChange = _this.handleChange.bind(_this);
+    return _this;
+  }
+
+  _createClass(ModelSelector, [{
+    key: 'handleSubmit',
+    value: function handleSubmit() {}
+  }, {
+    key: 'handleChange',
+    value: function handleChange(e) {
+      console.log('Change selected');
+      this.setState({ value: e.target.value });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'form',
+          { onSubmit: this.handleSubmit, onChange: this.handleChange },
+          _react2.default.createElement(
+            'label',
+            { className: 'selector-label' },
+            'Model Type:',
+            _react2.default.createElement(
+              'select',
+              { className: 'option-selector', value: this.state.value },
+              _react2.default.createElement(
+                'option',
+                { className: 'selector-option', value: 'select' },
+                'Select...'
+              ),
+              _react2.default.createElement(
+                'option',
+                { className: 'selector-option', value: 'linearRegression' },
+                'Linear Regression'
+              )
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return ModelSelector;
+}(_react2.default.Component);
+
+exports.default = ModelSelector;
 
 /***/ })
 /******/ ]);
