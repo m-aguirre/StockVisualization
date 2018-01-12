@@ -4,25 +4,8 @@ whitenoise
 quandl
 
 
-appnope==0.1.0
-
 Babel==2.5.0
-backports.shutil-get-terminal-size==1.0.0
-beautifulsoup4==4.6.0
-bitarray==0.8.1
-bkcharts==0.2
 
-bleach==2.0.0
-bokeh==0.12.7
-boto==2.48.0
-Bottleneck==1.2.1
-certifi==2017.7.27.1
-cffi==1.10.0
-chardet==3.0.4
-click==6.7
-
-
-colorama==0.3.9
 conda==4.3.16
 conda-build==2.1.5
 
@@ -30,10 +13,7 @@ conda-build==2.1.5
 
 Django==1.11.7
 django-webpack-loader==0.5.0
-docutils==0.14
 
-
-greenlet==0.4.12
 gunicorn==19.7.1
 h5py==2.7.0
 heapdict==1.0.0
@@ -43,10 +23,7 @@ html5lib==0.999999999
 
 numpy==1.13.1
 numpydoc==0.7.0
-odo==0.5.0
-olefile==0.44
-openpyxl==2.4.8
-packaging==16.8
+
 pandas==0.20.3
 
 scipy==0.19.1
