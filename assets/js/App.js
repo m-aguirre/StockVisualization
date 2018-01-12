@@ -17,10 +17,12 @@ class App extends React.Component {
       timeSeriesData: '',
       invalidSymbolInput: false,
       showSelectionContainer: false,
-      showOutlierDetector: false
+      showOutlierDetector: false,
+      model: 'none'
     }
 
     this.getTimeSeriesData = this.getTimeSeriesData.bind(this);
+    this.updateModelSelection = this.updateModelSelection.bind(this);
   }
 
   getTimeSeriesData(symbol) {
@@ -39,6 +41,9 @@ class App extends React.Component {
         });
     });
   }
+  updateModelSelection(model) {
+    this.setState({model: model, showOutlierDetector: true} , () => {console.log(this.state)})
+  }
     render(){
         return (
       <div className="App">
@@ -55,11 +60,9 @@ class App extends React.Component {
 
         </p>
         <div className="stock-description">
-          <h2>{this.state.inputSymbol}</h2>
-
           {
             this.state.showSelectionContainer ?
-            <SelectionContainer /> :
+            <SelectionContainer symbol={this.state.inputSymbol} selectModel={this.updateModelSelection}/> :
             <p>Please enter a valid stock symbol to get started (Ex: AAPL, TSLA, FB, etc.) </p>
           }
           {

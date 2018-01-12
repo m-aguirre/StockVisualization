@@ -11,10 +11,11 @@ class SelectionContainer extends React.Component {
   render() {
     return (
       <div className="selection-container">
-
+        <div className="symbol-display">
+          <h2>Stock: {this.props.symbol}</h2>
+        </div>
         <AnalysisTypeSelector />
-        <ModelSelector />
-        <div className="empty-div"></div>
+        <ModelSelector selectModel={this.props.selectModel}/>
       </div>
     )
   }

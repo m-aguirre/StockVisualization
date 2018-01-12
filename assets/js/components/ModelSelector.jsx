@@ -16,6 +16,7 @@ class ModelSelector extends React.Component {
   handleChange(e) {
     console.log('Change selected');
     this.setState({value: e.target.value});
+    this.props.selectModel(e.target.value);
   }
 
   render() {

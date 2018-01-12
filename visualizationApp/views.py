@@ -4,8 +4,10 @@ import os
 import quandl
 import pandas as pd
 
-quandl.ApiConfig.api_key = os.environ["quandl_key"]
+from stockvisual.private_keys import quandl_key
 
+#quandl.ApiConfig.api_key = os.environ["quandl_key"]
+quandl.ApiConfig.api_key = quandl_key
 def index(request):
     return render(request, '../templates/index.html')
 

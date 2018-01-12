@@ -56,8 +56,8 @@ body {
 .option-selector {
   display: block;
   text-align: center;
-  position: relative;
-  left: 10vw;
+  /*position: relative;*/
+  /*left: 10vw;*/
   width: 25vw;
   height: 8vh;
   margin-top: 5px;
@@ -68,9 +68,10 @@ body {
   height: 10vh;
 }
 
-.empty-div {
+.symbol-display {
   display: block;
   width: 33vw;
+  overflow: hidden;
 }
 /**********************  *****************/
 .regression-description {
@@ -88,13 +89,13 @@ body {
 }
 
 
-.stock-description  {
+/*.stock-description  {
     width: 100vw;
     height: auto;
     display: inline-block;
     text-align: center;
 
-}
+}*/
 .stock-description h2 {
   position: relative;
   display: inline-block;
