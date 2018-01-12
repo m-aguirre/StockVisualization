@@ -121,11 +121,11 @@ body {
 }
 
 .time-interval-button-container {
-  width: 70vw !important;
+  width: 100vw !important;
   height: auto;
   display: inline-flex;
   margin: 0;
-
+  margin-left: 15%;
 }
 
 .time-interval-button {

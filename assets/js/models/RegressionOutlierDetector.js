@@ -217,7 +217,7 @@ class RegressionOutlierDetector {
   }
 
 showInfo(outlier) {
-  var date = new Date(outlier.attr('date'));
+  var date = new Date(parseInt(outlier.attr('date')));
   var outlierDate = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
   var cx;
   if (outlier.attr('cx') > 350) {
