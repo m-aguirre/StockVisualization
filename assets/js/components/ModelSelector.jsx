@@ -24,7 +24,7 @@ class ModelSelector extends React.Component {
         <form onSubmit={this.handleSubmit} onChange={this.handleChange}>
         <label className="selector-label">
           Model Type:
-          <select className="option-selector" value={this.state.value}>
+          <select className="selector" value={this.state.value}>
             <option className="selector-option" value="select">Select...</option>
             <option className="selector-option" value="linearRegression">Linear Regression</option>
           </select>

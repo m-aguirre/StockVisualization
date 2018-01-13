@@ -15,6 +15,7 @@ class App extends React.Component {
     this.state = {
       inputSymbol: '',
       timeSeriesData: '',
+      showLoadingWheel: false,
       invalidSymbolInput: false,
       showSelectionContainer: false,
       showOutlierDetector: false,
@@ -27,17 +28,16 @@ class App extends React.Component {
 
   getTimeSeriesData(symbol) {
     let that = this;
-    this.setState({inputSymbol: symbol} , () => {
+    this.setState({inputSymbol: symbol, showLoadingWheel: true} , () => {
       var symbolRoute = 'search/' + symbol + '/';
-      console.log(symbolRoute);
       //symbolRoute = '/search/';
       axios.get(symbolRoute)
         .then( function(response) {
           console.log(response);
           if (response.data === "NOT FOUND") {
-            that.setState({invalidSymbolInput: true})
+            that.setState({invalidSymbolInput: true, showLoadingWheel: false})
           } else {
-            that.setState({timeSeriesData: response.data, showSelectionContainer: true, invalidSymbolInput: false});
+            that.setState({timeSeriesData: response.data, showSelectionContainer: true, invalidSymbolInput: false, showLoadingWheel: false});
           }
         })
         .catch( function(error) {
@@ -55,6 +55,11 @@ class App extends React.Component {
         <h1 className="main-header">Stock Visualization</h1>
         <div className="input-form-container">
           <SymbolInputField submitSymbol={this.getTimeSeriesData}/>
+          {
+            this.state.showLoadingWheel ?
+            <div className="loading-wheel"></div> :
+            null
+          }
           {
             this.state.invalidSymbolInput ?
             <p className="invalid-symbol-notification"> Invalid symbol!</p> :

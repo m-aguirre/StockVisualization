@@ -14,7 +14,11 @@ class RegressionOutlierDetector {
     }
     this.daysToSubtract = daysToSubtract;
     //controls speed of animation
-    this.delayFactor = 8;
+    if(daysToSubtract === 365) {
+      this.delayFactor = 6;
+    } else {
+      this.delayFactor = 8;
+    }
     this.endDate = Date.parse(new Date());
 
     this.xcoord = new DateScale(daysToSubtract);
@@ -66,13 +70,13 @@ class RegressionOutlierDetector {
   calculateRegressionEquation(data) {
 
     const businessDaysBetween = (startDate, endDate) => {
-  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  var daysBetween = Math.floor(Math.abs((endDate - startDate)/86400000)) * 5;
-  var weekEnds = Math.floor((new Date(endDate).getDay() - new Date(startDate).getDay())) * 2;
-  var businessDays = 1 + Math.floor((daysBetween - weekEnds) / 7);
-  //TODO subtract day in case where start/end is on sat or sun
-  return businessDays
-}
+      var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var daysBetween = Math.floor(Math.abs((endDate - startDate)/86400000)) * 5;
+      var weekEnds = Math.floor((new Date(endDate).getDay() - new Date(startDate).getDay())) * 2;
+      var businessDays = 1 + Math.floor((daysBetween - weekEnds) / 7);
+      //TODO subtract day in case where start/end is on sat or sun
+      return businessDays
+    }
 
     var sumX = 0;
     var sumY = 0;
@@ -86,12 +90,8 @@ class RegressionOutlierDetector {
       var date = d["Date"];
       var y = +d["Adj. Close"];
       //number of days between current date and start date - don't ask where 86400000 came from
-      //TODO adjust so it counts the number of BUSINESS days and not total days
-      //var x = (Math.floor((date - this.xcoord.startDate)/86400000));
       var x = businessDaysBetween(date, this.xcoord.startDate);
-      console.log("x is: ", x);
       sumX += x;
-      console.log("sumX is: ", sumX);
       sumY += y;
       sumXY += (x * y);
       sumXSquared += (x * x);
@@ -131,6 +131,7 @@ class RegressionOutlierDetector {
     }
     var days = 0;
     data.forEach((d) => {
+      d.outlier = false; //resets data point for new graph
       var pointOnLine = ((Math.floor((d["Date"] - this.xcoord.startDate)/86400000)) * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
       //var pointOnLine = (days * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
       if (+d["Adj. Close"] > (pointOnLine + sigma) || +d["Adj. Close"] < (pointOnLine - sigma)) {
@@ -166,41 +167,41 @@ class RegressionOutlierDetector {
   }
 
   plotDataPoints() {
-  var d3ViewPort =  d3.select('.viewport')
-  var svg = d3ViewPort.append('svg')
-  var dots = svg.append('g')
-  var that = this;
-  for (var i = 0; i < this.data.length; i++){
-    var data = []
-    data.push(this.data[i]);
-    dots.append("circle")
-      .data(data)
-      .attr("r", 0)
-      .attr("cx", (d) => { return this.xScale(d["Date"]) })
-      .attr("cy", (d) => { return this.yScale(d["Adj. Close"]) })
-      .attr('close', data[0]["Adj. Close"])
-      .attr('date', data[0]["Date"])
-      .attr('outlier', (d) => { return (d.outlier ? true : false)})
-      .on('mouseenter', function() {
-        var dataPoint = d3.select(this);
-        if (dataPoint.attr('outlier') === 'true') {
-          that.showInfo(dataPoint);
-          }
-        })
+    var d3ViewPort =  d3.select('.viewport')
+    var svg = d3ViewPort.append('svg')
+    var dots = svg.append('g')
+    var that = this;
+    for (var i = 0; i < this.data.length; i++){
+      var data = []
+      data.push(this.data[i]);
+      dots.append("circle")
+        .data(data)
+        .attr("r", 0)
+        .attr("cx", (d) => { return this.xScale(d["Date"]) })
+        .attr("cy", (d) => { return this.yScale(d["Adj. Close"]) })
+        .attr('close', data[0]["Adj. Close"])
+        .attr('date', data[0]["Date"])
+        .attr('outlier', (d) => { return (d.outlier ? true : false)})
+        .on('mouseenter', function() {
+          var dataPoint = d3.select(this);
+          if (dataPoint.attr('outlier') === 'true') {
+            that.showInfo(dataPoint);
+            }
+          })
         .on("mouseout", function() {
             d3.select('.viewport')
             .selectAll('rect').remove()
             d3.select('.viewport')
             .selectAll('.outlier-data').remove()
-      })
-      .style('stroke', 'black')
-      .style('fill', 'white')
-      .transition()
-      .delay(this.delayFactor * i)
-      .attr("r", 3.5)
-        }
-      setTimeout(() => {this.drawRegressionLine()}, this.millisecondDelay());
-      setTimeout(() => {this.colorOutliersRed(this.data)}, this.millisecondDelay() + 750);
+          })
+        .style('stroke', 'black')
+        .style('fill', 'white')
+        .transition()
+        .delay(this.delayFactor * i)
+        .attr("r", 3.5)
+      }
+    setTimeout(() => {this.drawRegressionLine()}, this.millisecondDelay());
+    setTimeout(() => {this.colorOutliersRed(this.data)}, this.millisecondDelay() + 750);
   }
 
   drawRegressionLine() {
@@ -228,37 +229,37 @@ class RegressionOutlierDetector {
     .style('fill', (d) => { return (d.outlier ? '#ff0202' : '#bcbcbc'); })
   }
 
-showInfo(outlier) {
-  var date = new Date(parseInt(outlier.attr('date')));
-  var outlierDate = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
-  var cx;
-  if (outlier.attr('cx') > 350) {
-    cx = outlier.attr('cx') - 115;
-  } else {
-    cx = outlier.attr('cx');
- }
-  var d3ViewPort =  d3.select('.viewport')
-  var svg = d3ViewPort.append('svg')
-  var rect = svg.append('rect')
-  .attr('width', 125)
-  .attr('height', 55)
-  .attr('class', 'outlier-info-box')
-  .attr('x', cx)
-  .attr('y', outlier.attr('cy'))
-  .attr('rx', 5)
-  .attr('ry', 5)
+  showInfo(outlier) {
+    var date = new Date(parseInt(outlier.attr('date')));
+    var outlierDate = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
+    var cx;
+    if (outlier.attr('cx') > 350) {
+      cx = outlier.attr('cx') - 115;
+    } else {
+      cx = outlier.attr('cx');
+    }
+    var d3ViewPort =  d3.select('.viewport')
+    var svg = d3ViewPort.append('svg')
+    var rect = svg.append('rect')
+    .attr('width', 125)
+    .attr('height', 55)
+    .attr('class', 'outlier-info-box')
+    .attr('x', cx)
+    .attr('y', outlier.attr('cy'))
+    .attr('rx', 5)
+    .attr('ry', 5)
 
-  svg.append('text')
-  .attr('class', 'outlier-data')
-  .attr("dx", function(d){return cx + 10})
-  .attr("dy", function(d){return +outlier.attr('cy') + 20})
-  .text("Date: " + outlierDate)
+    svg.append('text')
+    .attr('class', 'outlier-data')
+    .attr("dx", function(d){return cx + 10})
+    .attr("dy", function(d){return +outlier.attr('cy') + 20})
+    .text("Date: " + outlierDate)
 
-  svg.append('text')
-  .attr('class', 'outlier-data')
-  .attr("dx", function(d){return cx + 10})
-  .attr("dy", function(d){return +outlier.attr('cy') + 42.5})
-  .text("Close: $" + outlier.attr('close').slice(0,5))
+    svg.append('text')
+    .attr('class', 'outlier-data')
+    .attr("dx", function(d){return cx + 10})
+    .attr("dy", function(d){return +outlier.attr('cy') + 42.5})
+    .text("Close: $" + outlier.attr('close').slice(0,5))
   }
 
 }

@@ -30,6 +30,28 @@ body {
   left: 15%;
 }
 
+.loading-wheel {
+  width: 150px;
+  height: 150px;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .invalid-symbol-notification {
   color: red;
   margin-left: 2%;
@@ -46,6 +68,11 @@ body {
 
 .selection-container {
   display: inline-flex;
+  position: relative;
+  -webkit-animation-name: animatebottom;
+  -webkit-animation-duration: 1s;
+  animation-name: animatebottom;
+  animation-duration: 1s
 }
 
 .selector-label {
@@ -53,7 +80,7 @@ body {
   width: 33vw;
 }
 
-.option-selector {
+.selector {
   display: block;
   text-align: center;
   /*position: relative;*/
@@ -73,6 +100,17 @@ body {
   width: 33vw;
   overflow: hidden;
 }
+
+@-webkit-keyframes animatebottom {
+  from { bottom:-90px; opacity:0 }
+  to { bottom:0px; opacity:1 }
+}
+
+@keyframes animatebottom {
+  from{ bottom:-90px; opacity:0 }
+  to{ bottom:0; opacity:1 }
+}
+
 /**********************  *****************/
 .regression-description {
   width: 70%;
