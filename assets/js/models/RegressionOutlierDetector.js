@@ -90,7 +90,8 @@ class RegressionOutlierDetector {
       var date = d["Date"];
       var y = +d["Adj. Close"];
       //number of days between current date and start date - don't ask where 86400000 came from
-      var x = businessDaysBetween(date, this.xcoord.startDate);
+      //var x = businessDaysBetween(date, this.xcoord.startDate);
+      var x = (Math.floor((date - this.xcoord.startDate)/86400000));
       sumX += x;
       sumY += y;
       sumXY += (x * y);
@@ -130,7 +131,7 @@ class RegressionOutlierDetector {
       d.outlier = false; //resets data point for new graph
       var pointOnLine = ((Math.floor((d["Date"] - this.xcoord.startDate)/86400000)) * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
       //var pointOnLine = (days * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
-      if (+d["Adj. Close"] > (pointOnLine + (1.5 * sigma)) || +d["Adj. Close"] < (pointOnLine - (1.5 *sigma))) {
+      if (+d["Adj. Close"] > (pointOnLine + (1.25 * sigma)) || +d["Adj. Close"] < (pointOnLine - (1.25 * sigma))) {
         d.outlier = true;
       }
       days++;

@@ -28,7 +28,7 @@ class App extends React.Component {
 
   getTimeSeriesData(symbol) {
     let that = this;
-    this.setState({inputSymbol: symbol, showLoadingWheel: true} , () => {
+    this.setState({inputSymbol: symbol, invalidSymbolInput: false, showLoadingWheel: true} , () => {
       var symbolRoute = 'search/' + symbol + '/';
       //symbolRoute = '/search/';
       axios.get(symbolRoute)
