@@ -125,16 +125,12 @@ class RegressionOutlierDetector {
 
   //adds outlier tag to any stock date that is considered an outlier
   identifyOutliers(data, sigma) {
-    sigma = sigma;
-    if (this.daysToSubtract === 365) {
-      sigma = sigma * 0.5;
-    }
     var days = 0;
     data.forEach((d) => {
       d.outlier = false; //resets data point for new graph
       var pointOnLine = ((Math.floor((d["Date"] - this.xcoord.startDate)/86400000)) * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
       //var pointOnLine = (days * this.dataSummary.regressionCoef) + this.dataSummary.intercept;
-      if (+d["Adj. Close"] > (pointOnLine + sigma) || +d["Adj. Close"] < (pointOnLine - sigma)) {
+      if (+d["Adj. Close"] > (pointOnLine + (1.5 * sigma)) || +d["Adj. Close"] < (pointOnLine - (1.5 *sigma))) {
         d.outlier = true;
       }
       days++;
