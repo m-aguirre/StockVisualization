@@ -65,6 +65,15 @@ class RegressionOutlierDetector {
   */
   calculateRegressionEquation(data) {
 
+    const businessDaysBetween = (startDate, endDate) => {
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var daysBetween = Math.floor(Math.abs((endDate - startDate)/86400000)) * 5;
+  var weekEnds = Math.floor((new Date(endDate).getDay() - new Date(startDate).getDay())) * 2;
+  var businessDays = 1 + Math.floor((daysBetween - weekEnds) / 7);
+  //TODO subtract day in case where start/end is on sat or sun
+  return businessDays
+}
+
     var sumX = 0;
     var sumY = 0;
     var sumXY = 0;
@@ -78,7 +87,8 @@ class RegressionOutlierDetector {
       var y = +d["Adj. Close"];
       //number of days between current date and start date - don't ask where 86400000 came from
       //TODO adjust so it counts the number of BUSINESS days and not total days
-      var x = (Math.floor((date - this.xcoord.startDate)/86400000));
+      //var x = (Math.floor((date - this.xcoord.startDate)/86400000));
+      var x = businessDaysBetween(date, this.xcoord.startDate);
       console.log("x is: ", x);
       sumX += x;
       console.log("sumX is: ", sumX);

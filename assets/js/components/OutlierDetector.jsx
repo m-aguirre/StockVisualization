@@ -9,7 +9,6 @@ class OutlierDetector extends React.Component {
 
     this.show = this.show.bind(this);
     this.calculateStartDate = this.calculateStartDate.bind(this);
-    this.show(365);
   }
 
   calculateStartDate(daysToSubtract) {
