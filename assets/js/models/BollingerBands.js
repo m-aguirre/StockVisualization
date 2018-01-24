@@ -91,7 +91,7 @@ class BollingerBands {
     var svg = d3ViewPort.insert('svg')
 
      var line = d3.line()
-       .x((d) => { return this.xScale(Date.parse(d.Date))})
+       .x((d) => { return this.xScale(d["Date"])})
        .y((d) => { return this.yScale(d["Adj. Close"])})
 
       svg.append("path")
@@ -145,7 +145,6 @@ class BollingerBands {
     this.lowerBand = lowerBand;
   }
   plot() {
-    console.log("plot called")
     this.placeLine(this.rollingMeanData, 'rolling')
     this.createBands()
     this.placeLine(this.upperBand, 'bband')

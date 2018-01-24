@@ -1,12 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Lobster');
+@import url('https://fonts.googleapis.com/css?family=Bungee+Hairline');
+
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
 }
-
+:root {
+    /*--accent-color:#0187af;*/
+    --accent-color:#243C5C;
+}
 .main-header {
   text-align: center;
-  background-color: #0187af;
+  font-family: 'Bungee Hairline', cursive;
+  background-color: var(--accent-color);
   margin-top: 0;
   margin-bottom: 0;
   width: 100vw;
@@ -14,6 +21,37 @@ body {
   color: white;
   line-height: 7.5vh;
 }
+/************ LANDING ************/
+.landing {
+  width: 100vw;
+  height: 93vh;
+  background-color: grey;
+}
+.landing-inner-container {
+  display: flex;
+  justify-content: center;
+  width: 100vw;
+  height: 60vh;
+  background-color: lightsteelblue;
+  margin-top: 5vh;
+}
+
+.demo-container {
+  width: 30vw;
+  height: 30vh;
+  margin: 10vw;
+  background-color: black;
+}
+
+.landing-text-container {
+  width: 35vw;
+  height: 35vh;
+  margin: 10vw;
+  margin-left: 0;
+  background-color: orange;
+}
+
+/********************************/
 
 .input-form-container {
   margin-top: 0;
@@ -35,7 +73,7 @@ body {
 .loading-wheel {
   border: 8px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 8px solid #0187af;
+  border-top: 8px solid var(--accent-color);
   width: 25px;
   height: 25px;
   position: relative;
@@ -90,6 +128,8 @@ body {
   height: 8vh;
   margin-top: 5px;
   cursor: pointer;
+  color: white;
+  background-color: var(--accent-color);
 }
 
 .selector-option {
@@ -171,7 +211,7 @@ body {
 .time-interval-button {
   min-width: 10vw;
   height: 5vh;
-  background-color: #0187af;
+  background-color: var(--accent-color);
   color: white;
   border-radius: 5px;
   border-style: double;

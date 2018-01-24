@@ -1,6 +1,7 @@
 import React, { Component }from 'react';
 import axios from 'axios';
 
+import Landing from './components/Landing.jsx';
 import RegresionOutlierDetector from './models/RegressionOutlierDetector.js';
 import SymbolInputField from './components/SymbolInputField.jsx';
 import SelectionContainer from './components/SelectionContainer.jsx';
@@ -74,7 +75,8 @@ class App extends React.Component {
     render(){
         return (
       <div className="App">
-        <h1 className="main-header">Stock Visualization</h1>
+        <h1 className="main-header">Stock Visual</h1>
+        <Landing />
         <div className="input-form-container">
           <SymbolInputField submitSymbol={this.getTimeSeriesData}/>
           {
@@ -102,7 +104,7 @@ class App extends React.Component {
             <OutlierDetector timeSeriesData={this.state.timeSeriesData} model={this.getActiveModel()}/> :
             null
           }
-    
+
 
         </div>
       </div>
