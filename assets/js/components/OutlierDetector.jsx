@@ -39,7 +39,7 @@ class OutlierDetector extends React.Component {
         break;
     }
   //  var graph = new RegressionOutlierDetector(data, daysToSubtract);
-    graph.plotDataPoints();
+    graph.plot();
   }
 
   render() {

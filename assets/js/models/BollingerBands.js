@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import DateScale from "./DateScale.js"
 
 class BollingerBands {
-  constructor(data, currentDate, daysToSubtract) {
+  constructor(data, daysToSubtract) {
     this.data = data;
     this.dataSummary = {
       minClosingValue: d3.min(this.data, (d) => {return d["Adj. Close"]}),
@@ -16,9 +16,9 @@ class BollingerBands {
     this.daysToSubtract = daysToSubtract;
     //controls speed of animation
     this.delayFactor = 8;
-    this.endDate = currentDate;
+    this.endDate = Date.parse(new Date());
 
-    this.xcoord = new DateScale(currentDate, daysToSubtract);
+    this.xcoord = new DateScale(daysToSubtract);
     this.xScale = this.xcoord.xScale;
 
     //creates y scale based on min and max closing prices
@@ -31,13 +31,9 @@ class BollingerBands {
     this.upperBand = data;
     this.lowerBand = data;
 
+    d3.select('.viewport').remove();
     this.addViewport()
     this.rollingMeanData = this.rollingMean(this.data, 7)
-    this.placeLine(this.rollingMeanData, 'rolling')
-    this.createBands()
-    this.placeLine(this.upperBand, 'bband')
-    this.placeLine(this.lowerBand, 'bband')
-    this.placeLine(this.data)
 
   }
   maxYdomain() {
@@ -49,7 +45,7 @@ class BollingerBands {
   }
 
   addViewport() {
-    d3.select('.bollinger-container')
+    d3.select('.graph-pane')
       .append('svg')
       .attr('class', 'viewport')
       .attr('width', 700)
@@ -147,6 +143,14 @@ class BollingerBands {
     }
     this.upperBand = upperBand;
     this.lowerBand = lowerBand;
+  }
+  plot() {
+    console.log("plot called")
+    this.placeLine(this.rollingMeanData, 'rolling')
+    this.createBands()
+    this.placeLine(this.upperBand, 'bband')
+    this.placeLine(this.lowerBand, 'bband')
+    this.placeLine(this.data)
   }
 }
 

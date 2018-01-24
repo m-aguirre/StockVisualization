@@ -163,7 +163,7 @@ class RegressionOutlierDetector {
     .call(this.yAxis)
   }
 
-  plotDataPoints() {
+  plot() {
     var d3ViewPort =  d3.select('.viewport')
     var svg = d3ViewPort.append('svg')
     var dots = svg.append('g')

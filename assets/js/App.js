@@ -66,8 +66,10 @@ class App extends React.Component {
     });
   }
   updateModelSelection(model) {
+    console.log('model: ', model)
     this.setActiveModel(model);
     this.setState({model: model, showOutlierDetector: true})
+    console.log(this.state);
   }
     render(){
         return (
@@ -96,15 +98,12 @@ class App extends React.Component {
             <p>Please enter a valid stock symbol to get started (Ex: AAPL, TSLA, FB, etc.) </p>
           }
           {
-            this.state.model === 'linearRegression' ?
+            this.state.showOutlierDetector ?
             <OutlierDetector timeSeriesData={this.state.timeSeriesData} model={this.getActiveModel()}/> :
             null
           }
-          {
-            this.state.model === 'bollingerBands' ?
-            null :
-            null
-          }
+    
+
         </div>
       </div>
         );
