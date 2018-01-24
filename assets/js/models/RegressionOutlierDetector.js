@@ -142,7 +142,7 @@ class RegressionOutlierDetector {
     d3.select('.graph-pane')
       .append('svg')
       .attr('class', 'viewport')
-      .attr('width', 700)
+      .attr('width', '80%')
       .attr('height', 450)
 
     this.placeXAxis();

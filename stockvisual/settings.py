@@ -23,12 +23,12 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#from .private_keys import my_secret_key
-#SECRET_KEY = my_secret_key
-SECRET_KEY = os.environ['SECRET_KEY']
+from .private_keys import my_secret_key
+SECRET_KEY = my_secret_key
+#SECRET_KEY = os.environ['SECRET_KEY']
 
 #Quandl API key
-quandl_key = os.environ['quandl_key']
+#quandl_key = os.environ['quandl_key']
 
 
 # SECURITY WARNING: don't run with debug turned on in production!

@@ -1,7 +1,8 @@
 import React from 'react';
 
 import aaplData from '../models/dataFile.js';
-import RegressionOutlierDetector from '../models/RegressionOutlierDetector.js'
+import RegressionOutlierDetector from '../models/RegressionOutlierDetector.js';
+import BollingerBands from '../models/BollingerBands.js';
 
 class OutlierDetector extends React.Component {
   constructor(props) {
@@ -28,7 +29,16 @@ class OutlierDetector extends React.Component {
         data.push(sourceData[i]);
       }
     }
-    var graph = new RegressionOutlierDetector(data, daysToSubtract);
+    var graph;
+    switch(this.props.model) {
+      case "linearRegression":
+        graph = new RegressionOutlierDetector(data, daysToSubtract);
+        break;
+      case "bollingerBands":
+        graph = new BollingerBands(data, daysToSubtract);
+        break;
+    }
+  //  var graph = new RegressionOutlierDetector(data, daysToSubtract);
     graph.plotDataPoints();
   }
 

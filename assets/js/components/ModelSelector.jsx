@@ -27,6 +27,7 @@ class ModelSelector extends React.Component {
           <select className="selector" value={this.state.value}>
             <option className="selector-option" value="select">Select...</option>
             <option className="selector-option" value="linearRegression">Linear Regression</option>
+            <option className="selector-option" value="bollingerBands">Bollinger Bands</option>
           </select>
         </label>
       </form>

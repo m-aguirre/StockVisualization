@@ -19,11 +19,30 @@ class App extends React.Component {
       invalidSymbolInput: false,
       showSelectionContainer: false,
       showOutlierDetector: false,
-      model: 'none'
+      model: 'none',
+      activeModel: {
+        linearRegression: false,
+        bollingerBands: false
+      }
     }
 
     this.getTimeSeriesData = this.getTimeSeriesData.bind(this);
     this.updateModelSelection = this.updateModelSelection.bind(this);
+    this.setActiveModel = this.setActiveModel.bind(this);
+    this.getActiveModel = this.getActiveModel.bind(this);
+  }
+  setActiveModel(model) {
+    for (var key in this.state.activeModel) {
+      this.state.activeModel[key] = false;
+    }
+    this.state.activeModel[model] = true;
+  }
+  getActiveModel() {
+    for (var key in this.state.activeModel) {
+      if (this.state.activeModel[key]) {
+        return key;
+      }
+    }
   }
 
   getTimeSeriesData(symbol) {
@@ -47,7 +66,8 @@ class App extends React.Component {
     });
   }
   updateModelSelection(model) {
-    this.setState({model: model, showOutlierDetector: true} , () => {console.log(this.state)})
+    this.setActiveModel(model);
+    this.setState({model: model, showOutlierDetector: true})
   }
     render(){
         return (
@@ -76,8 +96,13 @@ class App extends React.Component {
             <p>Please enter a valid stock symbol to get started (Ex: AAPL, TSLA, FB, etc.) </p>
           }
           {
-            this.state.showOutlierDetector ?
-            <OutlierDetector timeSeriesData={this.state.timeSeriesData}/> :
+            this.state.model === 'linearRegression' ?
+            <OutlierDetector timeSeriesData={this.state.timeSeriesData} model={this.getActiveModel()}/> :
+            null
+          }
+          {
+            this.state.model === 'bollingerBands' ?
+            null :
             null
           }
         </div>
