@@ -5942,6 +5942,11 @@ var RegressionOutlierDetector = function () {
       start: { x: this.xcoord.startDate, y: 0 },
       end: { x: this.endDate, y: 0 }
     };
+
+    this.container = document.getElementsByClassName('graph-pane')[0];
+    this.width = this.container.width;
+    this.height = this.container.height;
+
     d3.select('.viewport').remove();
     this.calculateRegressionEquation(this.data);
     this.calculateSD(this.data);
@@ -6071,7 +6076,7 @@ var RegressionOutlierDetector = function () {
   }, {
     key: "addViewport",
     value: function addViewport() {
-      d3.select('.graph-pane').append('svg').attr('class', 'viewport').attr('width', '80%').attr('height', 450);
+      d3.select('.graph-pane').append('svg').attr('class', 'viewport').attr('width', '100%').attr('height', '100%').attr('viewBox', '0 0 ' + Math.min(this.width, this.height) + ' ' + Math.min(this.width, this.height)).attr('preserveAspectRatio', 'xMinYMin');
 
       this.placeXAxis();
       this.placeYAxis();
@@ -6088,8 +6093,8 @@ var RegressionOutlierDetector = function () {
       d3.select('.viewport').append('g').attr('transform', 'translate(0,' + 0 + ')').call(this.yAxis);
     }
   }, {
-    key: "plotDataPoints",
-    value: function plotDataPoints() {
+    key: "plot",
+    value: function plot() {
       var _this3 = this;
 
       var d3ViewPort = d3.select('.viewport');
@@ -30446,6 +30451,10 @@ var _axios = __webpack_require__(507);
 
 var _axios2 = _interopRequireDefault(_axios);
 
+var _Landing = __webpack_require__(530);
+
+var _Landing2 = _interopRequireDefault(_Landing);
+
 var _RegressionOutlierDetector = __webpack_require__(104);
 
 var _RegressionOutlierDetector2 = _interopRequireDefault(_RegressionOutlierDetector);
@@ -30502,10 +30511,29 @@ var App = function (_React$Component) {
 
     _this.getTimeSeriesData = _this.getTimeSeriesData.bind(_this);
     _this.updateModelSelection = _this.updateModelSelection.bind(_this);
+    _this.setActiveModel = _this.setActiveModel.bind(_this);
+    _this.getActiveModel = _this.getActiveModel.bind(_this);
     return _this;
   }
 
   _createClass(App, [{
+    key: 'setActiveModel',
+    value: function setActiveModel(model) {
+      for (var key in this.state.activeModel) {
+        this.state.activeModel[key] = false;
+      }
+      this.state.activeModel[model] = true;
+    }
+  }, {
+    key: 'getActiveModel',
+    value: function getActiveModel() {
+      for (var key in this.state.activeModel) {
+        if (this.state.activeModel[key]) {
+          return key;
+        }
+      }
+    }
+  }, {
     key: 'getTimeSeriesData',
     value: function getTimeSeriesData(symbol) {
       var that = this;
@@ -30528,7 +30556,10 @@ var App = function (_React$Component) {
   }, {
     key: 'updateModelSelection',
     value: function updateModelSelection(model) {
+      console.log('model: ', model);
+      this.setActiveModel(model);
       this.setState({ model: model, showOutlierDetector: true });
+      console.log(this.state);
     }
   }, {
     key: 'render',
@@ -30539,8 +30570,9 @@ var App = function (_React$Component) {
         _react2.default.createElement(
           'h1',
           { className: 'main-header' },
-          'Stock Visualization'
+          'Stock Visual'
         ),
+        _react2.default.createElement(_Landing2.default, null),
         _react2.default.createElement(
           'div',
           { className: 'input-form-container' },
@@ -30561,8 +30593,9 @@ var App = function (_React$Component) {
             null,
             'Please enter a valid stock symbol to get started (Ex: AAPL, TSLA, FB, etc.) '
           ),
-          this.state.model === 'linearRegression' ? _react2.default.createElement(_OutlierDetector2.default, { timeSeriesData: this.state.timeSeriesData }) : null
-        )
+          this.state.showOutlierDetector ? _react2.default.createElement(_OutlierDetector2.default, { timeSeriesData: this.state.timeSeriesData, model: this.getActiveModel() }) : null
+        ),
+        _react2.default.createElement('div', { className: 'footer' })
       );
     }
   }]);
@@ -43750,6 +43783,10 @@ var _RegressionOutlierDetector = __webpack_require__(104);
 
 var _RegressionOutlierDetector2 = _interopRequireDefault(_RegressionOutlierDetector);
 
+var _BollingerBands = __webpack_require__(529);
+
+var _BollingerBands2 = _interopRequireDefault(_BollingerBands);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -43791,8 +43828,17 @@ var OutlierDetector = function (_React$Component) {
           data.push(sourceData[i]);
         }
       }
-      var graph = new _RegressionOutlierDetector2.default(data, daysToSubtract);
-      graph.plotDataPoints();
+      var graph;
+      switch (this.props.model) {
+        case "linearRegression":
+          graph = new _RegressionOutlierDetector2.default(data, daysToSubtract);
+          break;
+        case "bollingerBands":
+          graph = new _BollingerBands2.default(data, daysToSubtract);
+          break;
+      }
+      //  var graph = new RegressionOutlierDetector(data, daysToSubtract);
+      graph.plot();
     }
   }, {
     key: 'render',
@@ -43927,10 +43973,11 @@ if(false) {
 
 exports = module.exports = __webpack_require__(496)(undefined);
 // imports
-
+exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Lobster);", ""]);
+exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Bungee+Hairline);", ""]);
 
 // module
-exports.push([module.i, "body {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n}\n\n.main-header {\n  text-align: center;\n  background-color: #0187af;\n  margin-top: 0;\n  margin-bottom: 0;\n  width: 100vw;\n  height: 7.5vh;\n  color: white;\n  line-height: 7.5vh;\n}\n\n.input-form-container {\n  margin-top: 0;\n  width: 100%;\n  height: 8%;\n  padding-top: 3%;\n  line-height: 8%;\n  display: flex;\n  flex-direction: row;\n}\n.symbol-input-form {\n  position: relative;\n  left: 15%;\n}\n.symbol-input-field-container {\n  width: 40%;\n}\n\n.loading-wheel {\n  border: 8px solid #f3f3f3;\n  border-radius: 50%;\n  border-top: 8px solid #0187af;\n  width: 25px;\n  height: 25px;\n  position: relative;\n  bottom: 5px;\n  -webkit-animation: spin 1.2s linear infinite;\n  animation: spin 1.2s linear infinite;\n}\n\n@-webkit-keyframes spin {\n  0% { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n\n@keyframes spin {\n  0% { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n.invalid-symbol-notification {\n  color: red;\n  margin-left: 2%;\n  position: relative;\n  bottom: 5px;\n  animation: blinker 1s linear infinite;\n}\n\n@keyframes blinker {\n  50% { opacity: 0; }\n}\n/************* ANALYSIS SELECTORS ******************/\n\n.selection-container {\n  display: inline-flex;\n  position: relative;\n  -webkit-animation-name: animatebottom;\n  -webkit-animation-duration: 1s;\n  animation-name: animatebottom;\n  animation-duration: 1s\n}\n\n.selector-label {\n  display: block;\n  width: 33vw;\n}\n\n.selector {\n  display: block;\n  text-align: center;\n  /*position: relative;*/\n  /*left: 10vw;*/\n  width: 25vw;\n  height: 8vh;\n  margin-top: 5px;\n  cursor: pointer;\n}\n\n.selector-option {\n  width: 25vw;\n  height: 10vh;\n}\n\n.symbol-display {\n  display: block;\n  width: 33vw;\n  overflow: hidden;\n}\n\n@-webkit-keyframes animatebottom {\n  from { bottom:-90px; opacity:0 }\n  to { bottom:0px; opacity:1 }\n}\n\n@keyframes animatebottom {\n  from{ bottom:-90px; opacity:0 }\n  to{ bottom:0; opacity:1 }\n}\n\n/**********************  *****************/\n.regression-description {\n  width: 70%;\n  height: auto;\n  margin: auto;\n}\n\n.graph-pane {\n  width: 100vw;\n  height: 500px;\n  margin: auto;\n  overflow: visible;\n  padding-left: 20px;\n}\n\n\n/*.stock-description  {\n    width: 100vw;\n    height: auto;\n    display: inline-block;\n    text-align: center;\n\n}*/\n.stock-description h2 {\n  position: relative;\n  display: inline-block;\n  float: left;\n  margin-left: 20px;\n}\n\n.viewport {\n  margin-left: 10%;\n  overflow: visible;\n}\n\n.outlier-info-box {\n  stroke: black;\n  fill: white;\n\n}\n\n.outlier-data {\n  overflow: hidden;\n  color: red;\n  font-size: 14px;\n}\n\n.time-interval-button-container {\n  width: 100vw !important;\n  height: auto;\n  display: inline-flex;\n  margin: 0;\n  margin-left: 15%;\n}\n\n.time-interval-button {\n  min-width: 10vw;\n  height: 5vh;\n  background-color: #0187af;\n  color: white;\n  border-radius: 5px;\n  border-style: double;\n  margin: 3%;\n  align-items: center;\n  line-height: 2.5vh;\n  text-align: center;\n  cursor: pointer;\n}\n\n.time-interval-button :hover {\n  transition: opacity 0.25s ease-in-out;\n  opacity: 0.75;\n}\n.time-interval-button p {\n  transform: translate(0, -50%);\n}\n", ""]);
+exports.push([module.i, "body {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n}\n:root {\n    /*--accent-color:#0187af;*/\n    --accent-color:#243C5C;\n}\n\n.App {\n  width: 100vw;\n  height: 300vh;\n}\n.main-header {\n  text-align: center;\n  font-family: 'Bungee Hairline', cursive;\n  background-color: var(--accent-color);\n  margin-top: 0;\n  margin-bottom: 0;\n  width: 100vw;\n  height: 7.5vh;\n  color: white;\n  line-height: 7.5vh;\n}\n/************ LANDING ************/\n.landing {\n  width: 100vw;\n  height: 93vh;\n  background-color: grey;\n}\n.landing-inner-container {\n  display: flex;\n  justify-content: center;\n  margin: 0;\n  width: 100vw;\n  height: 60vh;\n  background-color: lightsteelblue;\n}\n\n.demo-container {\n  width: 30vw;\n  height: 30vh;\n  margin: 10vw;\n  background-color: black;\n}\n\n.landing-text-container {\n  width: 35vw;\n  height: 35vh;\n  margin: 10vw;\n  margin-left: 0;\n  background-color: orange;\n}\n\n/********************************/\n\n.input-form-container {\n  margin-top: 0;\n  width: 100%;\n  height: 8%;\n  padding-top: 3%;\n  line-height: 8%;\n  display: flex;\n  flex-direction: row;\n}\n.symbol-input-form {\n  position: relative;\n  left: 15%;\n}\n.symbol-input-field-container {\n  width: 40%;\n}\n\n.loading-wheel {\n  border: 8px solid #f3f3f3;\n  border-radius: 50%;\n  border-top: 8px solid var(--accent-color);\n  width: 25px;\n  height: 25px;\n  position: relative;\n  bottom: 5px;\n  -webkit-animation: spin 1.2s linear infinite;\n  animation: spin 1.2s linear infinite;\n}\n\n@-webkit-keyframes spin {\n  0% { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n\n@keyframes spin {\n  0% { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n.invalid-symbol-notification {\n  color: red;\n  margin-left: 2%;\n  position: relative;\n  bottom: 5px;\n  animation: blinker 1s linear infinite;\n}\n\n@keyframes blinker {\n  50% { opacity: 0; }\n}\n/************* ANALYSIS SELECTORS ******************/\n\n.selection-container {\n  display: inline-flex;\n  position: relative;\n  -webkit-animation-name: animatebottom;\n  -webkit-animation-duration: 1s;\n  animation-name: animatebottom;\n  animation-duration: 1s\n}\n\n.selector-label {\n  display: block;\n  width: 33vw;\n}\n\n.selector {\n  display: block;\n  text-align: center;\n  /*position: relative;*/\n  /*left: 10vw;*/\n  width: 25vw;\n  height: 8vh;\n  margin-top: 5px;\n  cursor: pointer;\n  color: white;\n  background-color: var(--accent-color);\n}\n\n.selector-option {\n  width: 25vw;\n  height: 10vh;\n}\n\n.symbol-display {\n  display: block;\n  width: 33vw;\n  overflow: hidden;\n}\n\n@-webkit-keyframes animatebottom {\n  from { bottom:-90px; opacity:0 }\n  to { bottom:0px; opacity:1 }\n}\n\n@keyframes animatebottom {\n  from{ bottom:-90px; opacity:0 }\n  to{ bottom:0; opacity:1 }\n}\n\n/**********************  *****************/\n.regression-description {\n  width: 70%;\n  height: auto;\n  margin: auto;\n}\n\n.graph-pane {\n  width: 100vw;\n  height: 80%;\n  margin: auto;\n  overflow: visible;\n  padding-left: 25px;\n}\n\n\n/*.stock-description  {\n    width: 100vw;\n    height: auto;\n    display: inline-block;\n    text-align: center;\n\n}*/\n.stock-description h2 {\n  position: relative;\n  display: inline-block;\n  float: left;\n  margin-left: 20px;\n}\n\n.viewport {\n  margin-left: 10%;\n  overflow: visible;\n}\n\n.outlier-info-box {\n  stroke: black;\n  fill: white;\n\n}\n\n.outlier-data {\n  overflow: hidden;\n  color: red;\n  font-size: 14px;\n}\n\n.time-interval-button-container {\n  width: 100vw !important;\n  height: auto;\n  display: inline-flex;\n  margin: 0;\n  margin-left: 15%;\n}\n\n.time-interval-button {\n  min-width: 10vw;\n  height: 5vh;\n  background-color: var(--accent-color);\n  color: white;\n  border-radius: 5px;\n  border-style: double;\n  margin: 3%;\n  align-items: center;\n  line-height: 2.5vh;\n  text-align: center;\n  cursor: pointer;\n}\n\n.time-interval-button :hover {\n  transition: opacity 0.25s ease-in-out;\n  opacity: 0.75;\n}\n.time-interval-button p {\n  transform: translate(0, -50%);\n}\n\n\n/*********** FOOTER ***********/\n\n.footer {\n  width: 100vw;\n  height: 5vh;\n  margin: 0;\n  background-color: var(--accent-color);\n\n}\n", ""]);
 
 // exports
 
@@ -46375,6 +46422,266 @@ var ModelSelector = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = ModelSelector;
+
+/***/ }),
+/* 529 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _d = __webpack_require__(105);
+
+var d3 = _interopRequireWildcard(_d);
+
+var _DateScale = __webpack_require__(492);
+
+var _DateScale2 = _interopRequireDefault(_DateScale);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var BollingerBands = function () {
+  function BollingerBands(data, daysToSubtract) {
+    _classCallCheck(this, BollingerBands);
+
+    this.data = data;
+    this.dataSummary = {
+      minClosingValue: d3.min(this.data, function (d) {
+        return d["Adj. Close"];
+      }),
+      maxClosingValue: d3.max(this.data, function (d) {
+        return d["Adj. Close"];
+      }),
+      mean: 0,
+      sd: 0,
+      intercept: 0,
+      regressionCoef: 0
+    };
+
+    this.daysToSubtract = daysToSubtract;
+    //controls speed of animation
+    this.delayFactor = 8;
+    this.endDate = Date.parse(new Date());
+
+    this.xcoord = new _DateScale2.default(daysToSubtract);
+    this.xScale = this.xcoord.xScale;
+
+    //creates y scale based on min and max closing prices
+    this.yScale = d3.scaleLinear().domain([this.maxYdomain(), this.minYdomain()]).range([0, 450]);
+    this.xAxis = d3.axisBottom(this.xScale).ticks(this.xcoord.numTicks);
+    this.yAxis = d3.axisLeft(this.yScale).ticks(6);
+
+    this.container = document.getElementsByClassName('graph-pane')[0];
+    this.width = this.container.width;
+    this.height = this.container.height;
+
+    this.upperBand = data;
+    this.lowerBand = data;
+
+    d3.select('.viewport').remove();
+    this.addViewport();
+    this.rollingMeanData = this.rollingMean(this.data, 7);
+  }
+
+  _createClass(BollingerBands, [{
+    key: "maxYdomain",
+    value: function maxYdomain() {
+      return parseInt(this.dataSummary.maxClosingValue) + parseInt(this.dataSummary.maxClosingValue) / 12.0;
+    }
+  }, {
+    key: "minYdomain",
+    value: function minYdomain() {
+      return parseInt(this.dataSummary.minClosingValue) - parseInt(this.dataSummary.minClosingValue) / 12.0;
+    }
+  }, {
+    key: "addViewport",
+    value: function addViewport() {
+      d3.select('.graph-pane').append('svg').attr('class', 'viewport').attr('width', '100%').attr('height', '100%').attr('viewBox', '0 0 ' + Math.min(this.width, this.height) + ' ' + Math.min(this.width, this.height)).attr('preserveAspectRatio', 'xMinYMin');
+
+      this.placeXAxis();
+      this.placeYAxis();
+    }
+  }, {
+    key: "placeXAxis",
+    value: function placeXAxis() {
+      d3.select('.viewport').append('g').attr('transform', 'translate(0,' + 450 + ')') //putting it at 'height' (== 250) pushes scale off the graph
+      .call(this.xAxis);
+    }
+  }, {
+    key: "placeYAxis",
+    value: function placeYAxis() {
+      d3.select('.viewport').append('g').attr('transform', 'translate(0,' + 0 + ')').call(this.yAxis);
+    }
+  }, {
+    key: "placeLine",
+    value: function placeLine(data, type) {
+      var _this = this;
+
+      var lineColor;
+      var opacity = 0;
+      var duration = 0;
+      switch (type) {
+        case "rolling":
+          lineColor = '#d9dbe2';
+          break;
+        case "bband":
+          lineColor = '#1d3bc1';
+          duration = 1500;
+          break;
+        case "lower":
+          lineColor = 'green';
+          break;
+        default:
+          lineColor = 'black';
+      }
+      var d3ViewPort = d3.select('.viewport');
+      var svg = d3ViewPort.insert('svg');
+
+      var line = d3.line().x(function (d) {
+        return _this.xScale(d["Date"]);
+      }).y(function (d) {
+        return _this.yScale(d["Adj. Close"]);
+      });
+
+      svg.append("path").datum(data).attr("fill", "none").attr("stroke", lineColor).attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-width", 2.5).attr("d", line(data)).style('opacity', 0).transition().duration(duration).style('opacity', 1);
+    }
+  }, {
+    key: "calculateSD",
+    value: function calculateSD(data, mean) {
+      var sumSquares = data.reduce(function (sum, d) {
+        return sum + Math.pow(d - mean, 2);
+      }, 0);
+      return Math.sqrt(sumSquares / data.length);
+    }
+  }, {
+    key: "rollingMean",
+    value: function rollingMean(data, nDays) {
+      var rollingMeanData = data.map(function (a) {
+        return Object.assign({}, a);
+      });
+      var rollingStorage = [];
+      for (var i = 0; i < data.length - nDays; i++) {
+        rollingStorage.push(rollingMeanData[i]["Adj. Close"]);
+        if (i >= nDays) {
+          rollingStorage.shift();
+          var sum = rollingStorage.reduce(function (sum, val) {
+            return sum + val;
+          }, 0);
+          var mean = sum / nDays;
+          rollingMeanData[i]["Adj. Close"] = mean;
+          rollingMeanData[i]['rollingSD'] = this.calculateSD(rollingStorage, mean);
+        } else {
+          rollingMeanData.shift();
+        }
+      }
+      return rollingMeanData;
+    }
+  }, {
+    key: "createBands",
+    value: function createBands() {
+      var upperBand = this.rollingMeanData.map(function (a) {
+        return Object.assign({}, a);
+      });
+      var lowerBand = this.rollingMeanData.map(function (a) {
+        return Object.assign({}, a);
+      });
+      for (var i = 0; i < upperBand.length; i++) {
+        if (upperBand[i]['rollingSD']) {
+          upperBand[i]["Adj. Close"] = upperBand[i]["Adj. Close"] + 2 * upperBand[i]['rollingSD'];
+          lowerBand[i]["Adj. Close"] = lowerBand[i]["Adj. Close"] - 2 * lowerBand[i]['rollingSD'];
+        }
+      }
+      this.upperBand = upperBand;
+      this.lowerBand = lowerBand;
+    }
+  }, {
+    key: "plot",
+    value: function plot() {
+      this.placeLine(this.rollingMeanData, 'rolling');
+      this.createBands();
+      this.placeLine(this.upperBand, 'bband');
+      this.placeLine(this.lowerBand, 'bband');
+      this.placeLine(this.data);
+    }
+  }]);
+
+  return BollingerBands;
+}();
+
+exports.default = BollingerBands;
+
+/***/ }),
+/* 530 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(23);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Landing = function (_React$Component) {
+  _inherits(Landing, _React$Component);
+
+  function Landing(props) {
+    _classCallCheck(this, Landing);
+
+    return _possibleConstructorReturn(this, (Landing.__proto__ || Object.getPrototypeOf(Landing)).call(this, props));
+  }
+
+  _createClass(Landing, [{
+    key: "render",
+    value: function render() {
+      return _react2.default.createElement(
+        "div",
+        { className: "landing" },
+        _react2.default.createElement(
+          "div",
+          { className: "landing-inner-container" },
+          _react2.default.createElement("div", { className: "demo-container" }),
+          _react2.default.createElement(
+            "div",
+            { className: "landing-text-container" },
+            _react2.default.createElement(
+              "p",
+              null,
+              "A place to view animated visualizations of common models used to evaluate stocks."
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return Landing;
+}(_react2.default.Component);
+
+exports.default = Landing;
 
 /***/ })
 /******/ ]);

@@ -12,7 +12,7 @@ class Landing extends React.Component {
           <div className="demo-container"></div>
           <div className="landing-text-container">
             <p>A place to view animated visualizations of common models used to
-            evaluate stocks</p>
+            evaluate stocks.</p>
 
           </div>
         </div>

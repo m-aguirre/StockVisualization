@@ -35,6 +35,11 @@ class RegressionOutlierDetector {
       start: {x: this.xcoord.startDate, y: 0},
       end: {x: this.endDate, y: 0 }
     }
+
+    this.container = document.getElementsByClassName('graph-pane')[0];
+    this.width = this.container.width;
+    this.height = this.container.height;
+
     d3.select('.viewport').remove();
     this.calculateRegressionEquation(this.data);
     this.calculateSD(this.data);
@@ -142,8 +147,10 @@ class RegressionOutlierDetector {
     d3.select('.graph-pane')
       .append('svg')
       .attr('class', 'viewport')
-      .attr('width', '80%')
-      .attr('height', 450)
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox','0 0 '+Math.min(this.width,this.height) +' '+Math.min(this.width,this.height) )
+      .attr('preserveAspectRatio','xMinYMin')
 
     this.placeXAxis();
     this.placeYAxis();

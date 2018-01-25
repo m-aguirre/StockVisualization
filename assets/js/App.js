@@ -107,6 +107,7 @@ class App extends React.Component {
 
 
         </div>
+        <div className="footer"></div>
       </div>
         );
     }

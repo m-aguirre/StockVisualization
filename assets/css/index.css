@@ -10,6 +10,11 @@ body {
     /*--accent-color:#0187af;*/
     --accent-color:#243C5C;
 }
+
+.App {
+  width: 100vw;
+  height: 300vh;
+}
 .main-header {
   text-align: center;
   font-family: 'Bungee Hairline', cursive;
@@ -30,10 +35,10 @@ body {
 .landing-inner-container {
   display: flex;
   justify-content: center;
+  margin: 0;
   width: 100vw;
   height: 60vh;
   background-color: lightsteelblue;
-  margin-top: 5vh;
 }
 
 .demo-container {
@@ -162,10 +167,10 @@ body {
 
 .graph-pane {
   width: 100vw;
-  height: 500px;
+  height: 85vh;
   margin: auto;
   overflow: visible;
-  padding-left: 20px;
+  padding-left: 25px;
 }
 
 
@@ -228,4 +233,15 @@ body {
 }
 .time-interval-button p {
   transform: translate(0, -50%);
+}
+
+
+/*********** FOOTER ***********/
+
+.footer {
+  width: 100vw;
+  height: 5vh;
+  margin: 0;
+  background-color: var(--accent-color);
+
 }

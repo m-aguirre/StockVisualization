@@ -28,6 +28,10 @@ class BollingerBands {
     this.xAxis = d3.axisBottom(this.xScale).ticks(this.xcoord.numTicks);
     this.yAxis = d3.axisLeft(this.yScale).ticks(6);
 
+    this.container = document.getElementsByClassName('graph-pane')[0];
+    this.width = this.container.width;
+    this.height = this.container.height;
+
     this.upperBand = data;
     this.lowerBand = data;
 
@@ -48,8 +52,10 @@ class BollingerBands {
     d3.select('.graph-pane')
       .append('svg')
       .attr('class', 'viewport')
-      .attr('width', 700)
-      .attr('height', 450)
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('viewBox','0 0 '+Math.min(this.width,this.height) +' '+Math.min(this.width,this.height) )
+      .attr('preserveAspectRatio','xMinYMin')
 
     this.placeXAxis();
     this.placeYAxis();
