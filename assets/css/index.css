@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Lobster');
 @import url('https://fonts.googleapis.com/css?family=Bungee+Hairline');
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
 
 body {
   margin: 0;
@@ -8,10 +9,11 @@ body {
 }
 :root {
     /*--accent-color:#0187af;*/
-    --accent-color:#243C5C;
+    --accent-color: #243C5C;
 }
 
 .App {
+  font-family: 'Montserrat', sans-serif;
   width: 100vw;
   height: 300vh;
   position: relative;
@@ -23,15 +25,15 @@ body {
   margin-top: 0;
   margin-bottom: 0;
   width: 100vw;
-  height: 7.5vh;
+  height: 8.5vh;
   color: white;
-  line-height: 7.5vh;
+  line-height: 8.5vh;
+  font-size: 250%;
 }
 /************ LANDING ************/
 .landing {
   width: 100vw;
   height: 93vh;
-  background-color: grey;
 }
 .landing-inner-container {
   display: flex;
@@ -64,8 +66,27 @@ body {
 
 .down-arrow {
   background-image: url('../images/downArrowVector.png');
-  width: 30vw;
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 15vw;
   height: 15vh;
+  margin: auto;
+  margin-top: 8vh;
+  cursor: pointer;
+  animation: oscillate 1.5s linear infinite;
+}
+
+
+@keyframes oscillate {
+  0% {
+    bottom: 0;
+  }
+  50% {
+    bottom: 5%;
+  }
+  100% {
+    bottom: 0;
+  }
 }
 
 /********************************/
