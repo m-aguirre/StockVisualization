@@ -68,6 +68,7 @@ body {
   background-image: url('../images/downArrowVector.png');
   background-repeat: no-repeat;
   background-size: contain;
+  background-position: center;
   width: 15vw;
   height: 15vh;
   margin: auto;
@@ -95,7 +96,7 @@ body {
 .input-form-container {
   margin-top: 0;
   width: 100%;
-  height: 8%;
+  height: 8vh;
   padding-top: 3%;
   line-height: 8vh;
   display: flex;

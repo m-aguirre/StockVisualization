@@ -1,5 +1,6 @@
 import React from 'react';
 
+import DemoBox from './DemoBox.jsx';
 
 class Landing extends React.Component {
   constructor(props) {
@@ -38,7 +39,9 @@ class Landing extends React.Component {
             evaluate stocks.</p>
 
           </div>
-          <div className="demo-container"></div>
+          <div className="demo-container">
+            <DemoBox />
+          </div>
         </div>
         <div className="down-arrow" onClick={this.scroll}></div>
       </div>
