@@ -73,6 +73,7 @@ body {
   margin: auto;
   margin-top: 8vh;
   cursor: pointer;
+  position: relative;
   animation: oscillate 1.5s linear infinite;
 }
 
@@ -96,7 +97,7 @@ body {
   width: 100%;
   height: 8%;
   padding-top: 3%;
-  line-height: 8%;
+  line-height: 8vh;
   display: flex;
   flex-direction: row;
 }
@@ -222,7 +223,7 @@ body {
 }
 
 .viewport {
-  margin-left: 10%;
+  margin-left: 5%;
   overflow: visible;
 }
 

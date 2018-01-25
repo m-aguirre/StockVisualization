@@ -4,6 +4,30 @@ import React from 'react';
 class Landing extends React.Component {
   constructor(props) {
     super(props)
+
+    this.scroll = this.scroll.bind(this);
+  }
+
+  scroll() {
+
+    var smoothScroll = (limit) => {
+      let i = window.scrollY;
+      while (i < limit ) {
+        ((i)=> { setTimeout(() =>{
+          window.scrollTo(window.scrollY,i)
+        }, i)
+        })(i++);
+      }
+    }
+
+    var elem = document.getElementsByClassName('input-form-container')[0]
+    var bound = elem.getBoundingClientRect();
+    smoothScroll(bound.y);
+    //scrollTo(0, h.y + window.scrollY)
+    // document.querySelector('.input-form-container').scrollIntoView(true,
+    // {
+    //   behavior: 'smooth'
+    // });
   }
   render() {
     return (
@@ -16,7 +40,7 @@ class Landing extends React.Component {
           </div>
           <div className="demo-container"></div>
         </div>
-        <div className="down-arrow"></div>
+        <div className="down-arrow" onClick={this.scroll}></div>
       </div>
     )
   }
