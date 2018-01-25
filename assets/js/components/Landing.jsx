@@ -9,13 +9,14 @@ class Landing extends React.Component {
     return (
       <div className="landing">
         <div className="landing-inner-container">
-          <div className="demo-container"></div>
           <div className="landing-text-container">
             <p>A place to view animated visualizations of common models used to
             evaluate stocks.</p>
 
           </div>
+          <div className="demo-container"></div>
         </div>
+        <div className="down-arrow"></div>
       </div>
     )
   }

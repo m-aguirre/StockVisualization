@@ -14,6 +14,7 @@ body {
 .App {
   width: 100vw;
   height: 300vh;
+  position: relative;
 }
 .main-header {
   text-align: center;
@@ -34,26 +35,37 @@ body {
 }
 .landing-inner-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   margin: 0;
   width: 100vw;
   height: 60vh;
-  background-color: lightsteelblue;
 }
 
 .demo-container {
-  width: 30vw;
-  height: 30vh;
-  margin: 10vw;
-  background-color: black;
+  width: 50vw;
+  height: 65vh;
+  margin: auto;
+  margin-top: 5vh;
+  background-color: grey;
 }
 
 .landing-text-container {
-  width: 35vw;
+  width: 70vw;
   height: 35vh;
-  margin: 10vw;
-  margin-left: 0;
-  background-color: orange;
+  margin: auto;
+  margin-top:5vh;
+  border-radius: 5px;
+  background-color: var(--accent-color);
+  color: white;
+  font-size: 150%;
+  text-align: center;
+}
+
+.down-arrow {
+  background-image: url('../images/downArrowVector.png');
+  width: 30vw;
+  height: 15vh;
 }
 
 /********************************/
@@ -243,5 +255,7 @@ body {
   height: 5vh;
   margin: 0;
   background-color: var(--accent-color);
+  position: absolute;
+  bottom: 0;
 
 }
