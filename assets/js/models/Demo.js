@@ -5,8 +5,8 @@ class Demo {
   constructor(data, daysToSubtract) {
     this.data = aaplData;
     this.dataSummary = {
-      minClosingValue: d3.min(this.data, (d) => {return d["close"]}),
-      maxClosingValue: d3.max(this.data, (d) => {return d["close"]}),
+      minClosingValue: d3.min(this.data.aaplData, (d) => {return d["close"]}),
+      maxClosingValue: d3.max(this.data.aaplData, (d) => {return d["close"]}),
     }
 
     this.endDate = Date.parse(new Date());
@@ -15,7 +15,7 @@ class Demo {
     this.xScale = d3.scaleTime()
         .domain([
           new Date(Date.parse("2014-01-01")),
-          new Date(Date.parse("2015-01-01"))
+          new Date(Date.parse("2014-12-30"))
         ])
         .range([0, 600]);
   //  this.xScale = this.xcoord.xScale;
@@ -31,6 +31,7 @@ class Demo {
     this.container = document.getElementsByClassName('demo-container')[0];
     this.width = this.container.width;
     this.height = this.container.height;
+    console.log('width ', this.width);
 
     this.addViewport();
   }
@@ -50,7 +51,7 @@ class Demo {
       .attr('class', 'demoport')
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr('viewBox','0 0 '+Math.min(this.width,this.height) +' '+Math.min(this.width,this.height) )
+    //  .attr('viewBox','0 0 '+Math.min(this.width,this.height) +' '+Math.min(this.width,this.height) )
       .attr('preserveAspectRatio','xMinYMin')
 
     this.placeXAxis();
@@ -72,38 +73,41 @@ class Demo {
   }
 
   plot() {
+    var line = d3.line()
+    .x((d) => { console.log('date ' ,typeof(Date.parse(d.date))); return this.xScale(Date.parse(d.date))})
+    .y((d) => { console.log('close ' , typeof(d.close)); return this.yScale(d.close)})
+
+
     var d3ViewPort =  d3.select('.demoport')
     var svg = d3ViewPort.append('svg')
+    console.log(this.data.aaplData)
 
-    var line = d3.line()
-    .x((d) => { return this.xScale(Date.parse(d.date))})
-    .y((d) => { return this.yScale(d.close)})
     var path = svg.append("path")
-     .datum(this.data)
+     .datum(this.data.aaplData)
      .attr("id", "demoLine")
      .attr("fill", "none")
      .attr("stroke", "red")
      .attr("stroke-linejoin", "round")
      .attr("stroke-linecap", "round")
      .attr("stroke-width", 2.5)
-     .attr("d", line(this.data))
+     .attr("d", line(this.data.aaplData))
 
      var totalLength = path.node().getTotalLength();
+     console.log('len ',totalLength)
+     // d3.select("#demoLine")
+     //  .attr("stroke-dasharray", totalLength + " " + totalLength )
+     //  .attr("stroke-dashoffset", totalLength)
+     //  .transition()
+     //  .ease(d3.easeLinear)
+     //  .duration(3000)
+     //  .attr("stroke-dashoffset", 0)
+     //  .style('opacity', 1)
+     //  .transition()
+     //  .duration(1500)
+     //  .style('opacity', 0)
+     //  .remove()
 
-     d3.select("#demoLine")
-      .attr("stroke-dasharray", totalLength + " " + totalLength )
-      .attr("stroke-dashoffset", totalLength)
-      .transition()
-      .ease(d3.easeLinear)
-      .duration(3000)
-      .attr("stroke-dashoffset", 0)
-      .style('opacity', 1)
-      .transition()
-      .duration(1500)
-      .style('opacity', 0)
-      .remove()
-
-      setTimeout(()=> {this.plotDataPoints()}, 5000)
+    //  setTimeout(()=> {this.plot()}, 5000)
 
     }
 

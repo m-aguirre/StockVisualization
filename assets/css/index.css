@@ -49,7 +49,7 @@ body {
   height: 65vh;
   margin: auto;
   margin-top: 5vh;
-  background-color: grey;
+  overflow: visible;
 }
 
 .landing-text-container {
