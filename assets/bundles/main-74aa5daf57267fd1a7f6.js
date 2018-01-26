@@ -32269,6 +32269,10 @@ var _react = __webpack_require__(9);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _DemoBox = __webpack_require__(533);
+
+var _DemoBox2 = _interopRequireDefault(_DemoBox);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -32292,9 +32296,26 @@ var Landing = function (_React$Component) {
   _createClass(Landing, [{
     key: 'scroll',
     value: function scroll() {
-      document.querySelector('.input-form-container').scrollIntoView(alignToTop, {
-        behavior: 'smooth'
-      });
+
+      var smoothScroll = function smoothScroll(limit) {
+        var i = window.scrollY;
+        while (i < limit) {
+          (function (i) {
+            setTimeout(function () {
+              window.scrollTo(window.scrollY, i);
+            }, i);
+          })(i++);
+        }
+      };
+
+      var elem = document.getElementsByClassName('input-form-container')[0];
+      var bound = elem.getBoundingClientRect();
+      smoothScroll(bound.y);
+      //scrollTo(0, h.y + window.scrollY)
+      // document.querySelector('.input-form-container').scrollIntoView(true,
+      // {
+      //   behavior: 'smooth'
+      // });
     }
   }, {
     key: 'render',
@@ -32314,7 +32335,11 @@ var Landing = function (_React$Component) {
               'A place to view animated visualizations of common models used to evaluate stocks.'
             )
           ),
-          _react2.default.createElement('div', { className: 'demo-container' })
+          _react2.default.createElement(
+            'div',
+            { className: 'demo-container' },
+            _react2.default.createElement(_DemoBox2.default, null)
+          )
         ),
         _react2.default.createElement('div', { className: 'down-arrow', onClick: this.scroll })
       );
@@ -46112,7 +46137,7 @@ exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Bun
 exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Montserrat);", ""]);
 
 // module
-exports.push([module.i, "body {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n}\n:root {\n    /*--accent-color:#0187af;*/\n    --accent-color: #243C5C;\n}\n\n.App {\n  font-family: 'Montserrat', sans-serif;\n  width: 100vw;\n  height: 300vh;\n  position: relative;\n}\n.main-header {\n  text-align: center;\n  font-family: 'Bungee Hairline', cursive;\n  background-color: var(--accent-color);\n  margin-top: 0;\n  margin-bottom: 0;\n  width: 100vw;\n  height: 8.5vh;\n  color: white;\n  line-height: 8.5vh;\n  font-size: 250%;\n}\n/************ LANDING ************/\n.landing {\n  width: 100vw;\n  height: 93vh;\n}\n.landing-inner-container {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  margin: 0;\n  width: 100vw;\n  height: 60vh;\n}\n\n.demo-container {\n  width: 50vw;\n  height: 65vh;\n  margin: auto;\n  margin-top: 5vh;\n  background-color: grey;\n}\n\n.landing-text-container {\n  width: 70vw;\n  height: 35vh;\n  margin: auto;\n  margin-top:5vh;\n  border-radius: 5px;\n  background-color: var(--accent-color);\n  color: white;\n  font-size: 150%;\n  text-align: center;\n}\n\n.down-arrow {\n  background-image: url(" + __webpack_require__(532) + ");\n  background-repeat: no-repeat;\n  background-size: contain;\n  width: 15vw;\n  height: 15vh;\n  margin: auto;\n  margin-top: 8vh;\n  cursor: pointer;\n  animation: oscillate 1.5s linear infinite;\n}\n\n\n@keyframes oscillate {\n  0% {\n    bottom: 0;\n  }\n  50% {\n    bottom: 5%;\n  }\n  100% {\n    bottom: 0;\n  }\n}\n\n/********************************/\n\n.input-form-container {\n  margin-top: 0;\n  width: 100%;\n  height: 8%;\n  padding-top: 3%;\n  line-height: 8%;\n  display: flex;\n  flex-direction: row;\n}\n.symbol-input-form {\n  position: relative;\n  left: 15%;\n}\n.symbol-input-field-container {\n  width: 40%;\n}\n\n.loading-wheel {\n  border: 8px solid #f3f3f3;\n  border-radius: 50%;\n  border-top: 8px solid var(--accent-color);\n  width: 25px;\n  height: 25px;\n  position: relative;\n  bottom: 5px;\n  -webkit-animation: spin 1.2s linear infinite;\n  animation: spin 1.2s linear infinite;\n}\n\n@-webkit-keyframes spin {\n  0% { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n\n@keyframes spin {\n  0% { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n.invalid-symbol-notification {\n  color: red;\n  margin-left: 2%;\n  position: relative;\n  bottom: 5px;\n  animation: blinker 1s linear infinite;\n}\n\n@keyframes blinker {\n  50% { opacity: 0; }\n}\n/************* ANALYSIS SELECTORS ******************/\n\n.selection-container {\n  display: inline-flex;\n  position: relative;\n  -webkit-animation-name: animatebottom;\n  -webkit-animation-duration: 1s;\n  animation-name: animatebottom;\n  animation-duration: 1s\n}\n\n.selector-label {\n  display: block;\n  width: 33vw;\n}\n\n.selector {\n  display: block;\n  text-align: center;\n  /*position: relative;*/\n  /*left: 10vw;*/\n  width: 25vw;\n  height: 8vh;\n  margin-top: 5px;\n  cursor: pointer;\n  color: white;\n  background-color: var(--accent-color);\n}\n\n.selector-option {\n  width: 25vw;\n  height: 10vh;\n}\n\n.symbol-display {\n  display: block;\n  width: 33vw;\n  overflow: hidden;\n}\n\n@-webkit-keyframes animatebottom {\n  from { bottom:-90px; opacity:0 }\n  to { bottom:0px; opacity:1 }\n}\n\n@keyframes animatebottom {\n  from{ bottom:-90px; opacity:0 }\n  to{ bottom:0; opacity:1 }\n}\n\n/**********************  *****************/\n.regression-description {\n  width: 70%;\n  height: auto;\n  margin: auto;\n}\n\n.graph-pane {\n  width: 100vw;\n  height: 85vh;\n  margin: auto;\n  overflow: visible;\n  padding-left: 25px;\n}\n\n\n/*.stock-description  {\n    width: 100vw;\n    height: auto;\n    display: inline-block;\n    text-align: center;\n\n}*/\n.stock-description h2 {\n  position: relative;\n  display: inline-block;\n  float: left;\n  margin-left: 20px;\n}\n\n.viewport {\n  margin-left: 10%;\n  overflow: visible;\n}\n\n.outlier-info-box {\n  stroke: black;\n  fill: white;\n\n}\n\n.outlier-data {\n  overflow: hidden;\n  color: red;\n  font-size: 14px;\n}\n\n.time-interval-button-container {\n  width: 100vw !important;\n  height: auto;\n  display: inline-flex;\n  margin: 0;\n  margin-left: 15%;\n}\n\n.time-interval-button {\n  min-width: 10vw;\n  height: 5vh;\n  background-color: var(--accent-color);\n  color: white;\n  border-radius: 5px;\n  border-style: double;\n  margin: 3%;\n  align-items: center;\n  line-height: 2.5vh;\n  text-align: center;\n  cursor: pointer;\n}\n\n.time-interval-button :hover {\n  transition: opacity 0.25s ease-in-out;\n  opacity: 0.75;\n}\n.time-interval-button p {\n  transform: translate(0, -50%);\n}\n\n\n/*********** FOOTER ***********/\n\n.footer {\n  width: 100vw;\n  height: 5vh;\n  margin: 0;\n  background-color: var(--accent-color);\n  position: absolute;\n  bottom: 0;\n\n}\n", ""]);
+exports.push([module.i, "body {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n}\n:root {\n    /*--accent-color:#0187af;*/\n    --accent-color: #243C5C;\n}\n\n.App {\n  font-family: 'Montserrat', sans-serif;\n  width: 100vw;\n  height: 300vh;\n  position: relative;\n}\n.main-header {\n  text-align: center;\n  font-family: 'Bungee Hairline', cursive;\n  background-color: var(--accent-color);\n  margin-top: 0;\n  margin-bottom: 0;\n  width: 100vw;\n  height: 8.5vh;\n  color: white;\n  line-height: 8.5vh;\n  font-size: 250%;\n}\n/************ LANDING ************/\n.landing {\n  width: 100vw;\n  height: 93vh;\n}\n.landing-inner-container {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  margin: 0;\n  width: 100vw;\n  height: 60vh;\n}\n\n.demo-container {\n  width: 50vw;\n  height: 40vh;\n  margin: auto;\n  margin-top: 5vh;\n  overflow: visible;\n}\n\n.landing-text-container {\n  width: 70vw;\n  height: 35vh;\n  margin: auto;\n  margin-top:5vh;\n  border-radius: 5px;\n  background-color: var(--accent-color);\n  color: white;\n  font-size: 150%;\n  text-align: center;\n}\n\n.down-arrow {\n  background-image: url(" + __webpack_require__(532) + ");\n  background-repeat: no-repeat;\n  background-size: contain;\n  background-position: center;\n  width: 15vw;\n  height: 15vh;\n  margin: auto;\n  margin-top: 12vh;\n  cursor: pointer;\n  position: relative;\n  animation: oscillate 1.5s linear infinite;\n}\n\n\n@keyframes oscillate {\n  0% {\n    bottom: 0;\n  }\n  50% {\n    bottom: 5%;\n  }\n  100% {\n    bottom: 0;\n  }\n}\n\n/********************************/\n\n.input-form-container {\n  margin-top: 0;\n  width: 100%;\n  height: 8vh;\n  padding-top: 3%;\n  line-height: 8vh;\n  display: flex;\n  flex-direction: row;\n}\n.symbol-input-form {\n  position: relative;\n  left: 15%;\n}\n.symbol-input-field-container {\n  width: 40%;\n}\n\n.loading-wheel {\n  border: 8px solid #f3f3f3;\n  border-radius: 50%;\n  border-top: 8px solid var(--accent-color);\n  width: 25px;\n  height: 25px;\n  position: relative;\n  bottom: 5px;\n  -webkit-animation: spin 1.2s linear infinite;\n  animation: spin 1.2s linear infinite;\n}\n\n@-webkit-keyframes spin {\n  0% { -webkit-transform: rotate(0deg); }\n  100% { -webkit-transform: rotate(360deg); }\n}\n\n@keyframes spin {\n  0% { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n.invalid-symbol-notification {\n  color: red;\n  margin-left: 2%;\n  position: relative;\n  bottom: 5px;\n  animation: blinker 1s linear infinite;\n}\n\n@keyframes blinker {\n  50% { opacity: 0; }\n}\n/************* ANALYSIS SELECTORS ******************/\n\n.selection-container {\n  display: inline-flex;\n  position: relative;\n  -webkit-animation-name: animatebottom;\n  -webkit-animation-duration: 1s;\n  animation-name: animatebottom;\n  animation-duration: 1s\n}\n\n.selector-label {\n  display: block;\n  width: 33vw;\n}\n\n.selector {\n  display: block;\n  text-align: center;\n  /*position: relative;*/\n  /*left: 10vw;*/\n  width: 25vw;\n  height: 8vh;\n  margin-top: 5px;\n  cursor: pointer;\n  color: white;\n  background-color: var(--accent-color);\n}\n\n.selector-option {\n  width: 25vw;\n  height: 10vh;\n}\n\n.symbol-display {\n  display: block;\n  width: 33vw;\n  overflow: hidden;\n}\n\n@-webkit-keyframes animatebottom {\n  from { bottom:-90px; opacity:0 }\n  to { bottom:0px; opacity:1 }\n}\n\n@keyframes animatebottom {\n  from{ bottom:-90px; opacity:0 }\n  to{ bottom:0; opacity:1 }\n}\n\n/**********************  *****************/\n.regression-description {\n  width: 70%;\n  height: auto;\n  margin: auto;\n}\n\n.graph-pane {\n  width: 100vw;\n  height: 85vh;\n  margin: auto;\n  overflow: visible;\n  padding-left: 25px;\n}\n\n\n/*.stock-description  {\n    width: 100vw;\n    height: auto;\n    display: inline-block;\n    text-align: center;\n\n}*/\n.stock-description h2 {\n  position: relative;\n  display: inline-block;\n  float: left;\n  margin-left: 20px;\n}\n\n.viewport {\n  margin-left: 5%;\n  overflow: visible;\n}\n\n.outlier-info-box {\n  stroke: black;\n  fill: white;\n\n}\n\n.outlier-data {\n  overflow: hidden;\n  color: red;\n  font-size: 14px;\n}\n\n.time-interval-button-container {\n  width: 100vw !important;\n  height: auto;\n  display: inline-flex;\n  margin: 0;\n  margin-left: 15%;\n}\n\n.time-interval-button {\n  min-width: 10vw;\n  height: 5vh;\n  background-color: var(--accent-color);\n  color: white;\n  border-radius: 5px;\n  border-style: double;\n  margin: 3%;\n  align-items: center;\n  line-height: 2.5vh;\n  text-align: center;\n  cursor: pointer;\n}\n\n.time-interval-button :hover {\n  transition: opacity 0.25s ease-in-out;\n  opacity: 0.75;\n}\n.time-interval-button p {\n  transform: translate(0, -50%);\n}\n\n\n/*********** FOOTER ***********/\n\n.footer {\n  width: 100vw;\n  height: 5vh;\n  margin: 0;\n  background-color: var(--accent-color);\n  position: absolute;\n  bottom: 0;\n\n}\n", ""]);
 
 // exports
 
@@ -46672,6 +46697,187 @@ module.exports = function (css) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "1cf575dca6a3106d1db70212426fa5c4.png";
+
+/***/ }),
+/* 533 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(9);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Demo = __webpack_require__(534);
+
+var _Demo2 = _interopRequireDefault(_Demo);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DemoBox = function (_React$Component) {
+  _inherits(DemoBox, _React$Component);
+
+  function DemoBox(props) {
+    _classCallCheck(this, DemoBox);
+
+    return _possibleConstructorReturn(this, (DemoBox.__proto__ || Object.getPrototypeOf(DemoBox)).call(this, props));
+  }
+
+  _createClass(DemoBox, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var demo = new _Demo2.default();
+      demo.plot();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement('div', null);
+    }
+  }]);
+
+  return DemoBox;
+}(_react2.default.Component);
+
+exports.default = DemoBox;
+
+/***/ }),
+/* 534 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _d = __webpack_require__(58);
+
+var d3 = _interopRequireWildcard(_d);
+
+var _dataFile = __webpack_require__(195);
+
+var _dataFile2 = _interopRequireDefault(_dataFile);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Demo = function () {
+  function Demo(data, daysToSubtract) {
+    _classCallCheck(this, Demo);
+
+    this.data = _dataFile2.default;
+    this.dataSummary = {
+      minClosingValue: d3.min(this.data.aaplData, function (d) {
+        return d["close"];
+      }),
+      maxClosingValue: d3.max(this.data.aaplData, function (d) {
+        return d["close"];
+      })
+    };
+
+    this.container = document.getElementsByClassName('demo-container')[0];
+    this.width = this.container.offsetWidth;
+    this.height = this.container.offsetHeight;
+
+    //  this.xcoord = new DateScale(daysToSubtract);
+    this.xScale = d3.scaleTime().domain([new Date(Date.parse("2014-01-01")), new Date(Date.parse("2014-12-30"))]).range([0, this.width]);
+    //  this.xScale = this.xcoord.xScale;
+
+    //creates y scale based on min and max closing prices
+    this.yScale = d3.scaleLinear().domain([this.maxYdomain(), this.minYdomain()]).range([0, this.height]);
+    this.xAxis = d3.axisBottom(this.xScale).ticks(10);
+    this.yAxis = d3.axisLeft(this.yScale).ticks(6);
+
+    console.log('width ', this.width);
+
+    this.addViewport();
+  }
+
+  //Calculate min and max values for y axis, high/low +/- 20%
+
+
+  _createClass(Demo, [{
+    key: "maxYdomain",
+    value: function maxYdomain() {
+      return parseInt(this.dataSummary.maxClosingValue) + parseInt(this.dataSummary.maxClosingValue) / 5.0;
+    }
+  }, {
+    key: "minYdomain",
+    value: function minYdomain() {
+      return parseInt(this.dataSummary.minClosingValue) - parseInt(this.dataSummary.minClosingValue) / 5.0;
+    }
+  }, {
+    key: "addViewport",
+    value: function addViewport() {
+      d3.select('.demo-container').append('svg').attr('class', 'demoport').attr('width', '100%').attr('height', '100%')
+      //  .attr('viewBox','0 0 '+Math.min(this.width,this.height) +' '+Math.min(this.width,this.height) )
+      .attr('preserveAspectRatio', 'xMinYMin');
+      //s
+      //  this.placeXAxis();
+      //  this.placeYAxis();
+    }
+  }, {
+    key: "placeXAxis",
+    value: function placeXAxis() {
+      d3.select('.demoport').append('g').attr('transform', 'translate(0,' + 450 + ')') //putting it at 'height' (== 250) pushes scale off the graph
+      .call(this.xAxis);
+    }
+  }, {
+    key: "placeYAxis",
+    value: function placeYAxis() {
+      d3.select('.demoport').append('g').attr('transform', 'translate(0,' + 0 + ')').call(this.yAxis);
+    }
+  }, {
+    key: "plot",
+    value: function plot() {
+      var _this = this;
+
+      var line = d3.line().x(function (d) {
+        return _this.xScale(Date.parse(d.date));
+      }).y(function (d) {
+        return _this.yScale(d.close);
+      });
+
+      var d3ViewPort = d3.select('.demoport');
+      var svg = d3ViewPort.append('svg');
+      console.log(this.data.aaplData);
+
+      var path = svg.append("path").datum(this.data.aaplData).attr("id", "demoLine").attr("fill", "none").attr("stroke", "#243C5C").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-width", 2.5).attr("d", line(this.data.aaplData));
+
+      var totalLength = path.node().getTotalLength();
+      console.log('len ', totalLength);
+      d3.select("#demoLine").attr("stroke-dasharray", totalLength + " " + totalLength).attr("stroke-dashoffset", totalLength).transition().ease(d3.easeLinear).duration(3000).attr("stroke-dashoffset", 0).style('opacity', 1).transition().duration(1500).style('opacity', 0).remove();
+
+      setTimeout(function () {
+        _this.plot();
+      }, 5000);
+    }
+  }]);
+
+  return Demo;
+}();
+
+exports.default = Demo;
 
 /***/ })
 /******/ ]);

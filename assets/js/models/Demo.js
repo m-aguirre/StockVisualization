@@ -9,7 +9,10 @@ class Demo {
       maxClosingValue: d3.max(this.data.aaplData, (d) => {return d["close"]}),
     }
 
-    this.endDate = Date.parse(new Date());
+
+    this.container = document.getElementsByClassName('demo-container')[0];
+    this.width = this.container.offsetWidth;
+    this.height = this.container.offsetHeight;
 
   //  this.xcoord = new DateScale(daysToSubtract);
     this.xScale = d3.scaleTime()
@@ -17,20 +20,17 @@ class Demo {
           new Date(Date.parse("2014-01-01")),
           new Date(Date.parse("2014-12-30"))
         ])
-        .range([0, 600]);
+        .range([0, this.width]);
   //  this.xScale = this.xcoord.xScale;
 
     //creates y scale based on min and max closing prices
     this.yScale = d3.scaleLinear()
         .domain([this.maxYdomain(),this.minYdomain()])
-        .range([0,450]);
+        .range([0,this.height]);
     this.xAxis = d3.axisBottom(this.xScale).ticks(10);
     this.yAxis = d3.axisLeft(this.yScale).ticks(6);
 
 
-    this.container = document.getElementsByClassName('demo-container')[0];
-    this.width = this.container.width;
-    this.height = this.container.height;
     console.log('width ', this.width);
 
     this.addViewport();
@@ -53,9 +53,9 @@ class Demo {
       .attr('height', '100%')
     //  .attr('viewBox','0 0 '+Math.min(this.width,this.height) +' '+Math.min(this.width,this.height) )
       .attr('preserveAspectRatio','xMinYMin')
-
-    this.placeXAxis();
-    this.placeYAxis();
+ //s
+  //  this.placeXAxis();
+  //  this.placeYAxis();
   }
 
   placeXAxis() {
@@ -74,8 +74,8 @@ class Demo {
 
   plot() {
     var line = d3.line()
-    .x((d) => { console.log('date ' ,typeof(Date.parse(d.date))); return this.xScale(Date.parse(d.date))})
-    .y((d) => { console.log('close ' , typeof(d.close)); return this.yScale(d.close)})
+    .x((d) => { return this.xScale(Date.parse(d.date))})
+    .y((d) => { return this.yScale(d.close)})
 
 
     var d3ViewPort =  d3.select('.demoport')
@@ -86,7 +86,7 @@ class Demo {
      .datum(this.data.aaplData)
      .attr("id", "demoLine")
      .attr("fill", "none")
-     .attr("stroke", "red")
+     .attr("stroke", "#243C5C")
      .attr("stroke-linejoin", "round")
      .attr("stroke-linecap", "round")
      .attr("stroke-width", 2.5)
@@ -94,20 +94,20 @@ class Demo {
 
      var totalLength = path.node().getTotalLength();
      console.log('len ',totalLength)
-     // d3.select("#demoLine")
-     //  .attr("stroke-dasharray", totalLength + " " + totalLength )
-     //  .attr("stroke-dashoffset", totalLength)
-     //  .transition()
-     //  .ease(d3.easeLinear)
-     //  .duration(3000)
-     //  .attr("stroke-dashoffset", 0)
-     //  .style('opacity', 1)
-     //  .transition()
-     //  .duration(1500)
-     //  .style('opacity', 0)
-     //  .remove()
+     d3.select("#demoLine")
+      .attr("stroke-dasharray", totalLength + " " + totalLength )
+      .attr("stroke-dashoffset", totalLength)
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(3000)
+      .attr("stroke-dashoffset", 0)
+      .style('opacity', 1)
+      .transition()
+      .duration(1500)
+      .style('opacity', 0)
+      .remove()
 
-    //  setTimeout(()=> {this.plot()}, 5000)
+     setTimeout(()=> {this.plot()}, 5000)
 
     }
 

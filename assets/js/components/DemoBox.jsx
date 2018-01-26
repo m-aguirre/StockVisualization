@@ -13,7 +13,7 @@ class DemoBox extends React.Component {
   }
   render() {
     return (
-      <div>Here goes the demo</div>
+      <div></div>
     )
   }
 }
