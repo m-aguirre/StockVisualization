@@ -65,7 +65,7 @@ body {
 }
 
 .down-arrow {
-  background-image: url('../images/downArrowVector.png');
+  /*background-image: url('../images/downArrowVector.png');*/
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;

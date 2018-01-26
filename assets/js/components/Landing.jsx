@@ -1,7 +1,7 @@
 import React from 'react';
 
 import DemoBox from './DemoBox.jsx';
-
+import img from '../../images/downArrowVector.png';
 class Landing extends React.Component {
   constructor(props) {
     super(props)
@@ -38,7 +38,7 @@ class Landing extends React.Component {
             <DemoBox />
           </div>
         </div>
-        <div className="down-arrow" onClick={this.scroll}></div>
+        <div className="down-arrow" onClick={this.scroll} style={{backgroundImage: `url(${img})`}}></div>
       </div>
     )
   }
