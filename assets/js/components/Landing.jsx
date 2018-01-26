@@ -24,19 +24,14 @@ class Landing extends React.Component {
     var elem = document.getElementsByClassName('input-form-container')[0]
     var bound = elem.getBoundingClientRect();
     smoothScroll(bound.y);
-    //scrollTo(0, h.y + window.scrollY)
-    // document.querySelector('.input-form-container').scrollIntoView(true,
-    // {
-    //   behavior: 'smooth'
-    // });
   }
   render() {
     return (
       <div className="landing">
         <div className="landing-inner-container">
           <div className="landing-text-container">
-            <p>A place to view animated visualizations of common models used to
-            evaluate stocks.</p>
+            <p> View animated visualizations of models applied to stock market data
+            </p>
 
           </div>
           <div className="demo-container">
