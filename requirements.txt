@@ -11,7 +11,7 @@ gunicorn==19.7.1
 h5py==2.7.0
 heapdict==1.0.0
 html5lib==0.999999999
-numpy==1.13.1
+numpy==1.22.0
 numpydoc==0.7.0
 pandas==0.20.3
 scipy==0.19.1
